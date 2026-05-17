@@ -1,7 +1,8 @@
 use anyhow::Result;
 use minijinja::{context, Environment};
 
-use crate::models::base::Renderable;
+use crate::models::block::Block;
+use crate::models::ui_component::ComponentBlock;
 use crate::parser::ParsedDocument;
 
 pub struct TemplateEngine {
@@ -26,20 +27,42 @@ impl TemplateEngine {
 }
 
 pub fn render_document(parsed: &ParsedDocument, engine: &TemplateEngine) -> Result<String> {
-    let mut body = parsed.html.clone();
-    for (index, component) in parsed.components.iter().enumerate() {
-        let rendered = component.render(engine);
-        let placeholder = format!("<!-- COMPONENT_PLACEHOLDER_{} -->", index);
-        body = body.replace(&placeholder, &rendered);
-    }
+    let body = render_blocks(&parsed.blocks, engine);
     engine.render("base", context! { content => body })
+}
+
+fn render_blocks(blocks: &[Block], engine: &TemplateEngine) -> String {
+    let mut result = String::new();
+    for block in blocks {
+        let rendered = render_block(block, engine);
+        if !result.is_empty()
+            && !result.ends_with('\n')
+            && !rendered.starts_with('\n')
+        {
+            result.push('\n');
+        }
+        result.push_str(&rendered);
+    }
+    result
+}
+
+fn render_block(block: &Block, engine: &TemplateEngine) -> String {
+    match block {
+        Block::Prose(html) => html.clone(),
+        Block::Component(comp) => render_component(comp, engine),
+    }
+}
+
+fn render_component(comp: &ComponentBlock, engine: &TemplateEngine) -> String {
+    comp.render(engine)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::models::components::prompt_box::PromptBoxData;
-    use crate::models::ui_component::UiComponent;
+    use crate::models::document_context::DocumentContext;
+    use crate::models::ui_component::{ComponentBlock, UiComponent};
 
     #[test]
     fn template_engine_loads_all_templates() {
@@ -66,14 +89,21 @@ mod tests {
     }
 
     #[test]
-    fn render_document_replaces_placeholders() {
+    fn render_document_produces_correct_output() {
         let engine = TemplateEngine::new().unwrap();
         let parsed = ParsedDocument {
-            html: "<h1>Title</h1>\n<!-- COMPONENT_PLACEHOLDER_0 -->\n<p>Text</p>".to_string(),
-            components: vec![UiComponent::PromptBox(PromptBoxData {
-                label: "My Label".to_string(),
-                content: "My Content".to_string(),
-            })],
+            blocks: vec![
+                Block::Prose("<h1>Title</h1>\n".to_string()),
+                Block::Component(ComponentBlock {
+                    component: UiComponent::PromptBox(PromptBoxData {
+                        label: "My Label".to_string(),
+                        content: "My Content".to_string(),
+                    }),
+                    children: vec![],
+                }),
+                Block::Prose("<p>Text</p>\n".to_string()),
+            ],
+            context: DocumentContext::default(),
         };
 
         let result = render_document(&parsed, &engine).unwrap();

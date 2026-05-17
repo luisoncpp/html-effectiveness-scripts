@@ -1,6 +1,7 @@
 use serde::Deserialize;
 
 use super::base::Renderable;
+use super::block::Block;
 use super::components::prompt_box::PromptBoxData;
 use crate::renderer::TemplateEngine;
 
@@ -9,6 +10,38 @@ use crate::renderer::TemplateEngine;
 pub enum UiComponent {
     #[serde(rename = "prompt-box")]
     PromptBox(PromptBoxData),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ComponentBlock {
+    pub component: UiComponent,
+    pub children: Vec<Block>,
+}
+
+impl ComponentBlock {
+    pub fn render(&self, engine: &TemplateEngine) -> String {
+        let children_html: String = self
+            .children
+            .iter()
+            .map(|child| match child {
+                Block::Prose(html) => html.clone(),
+                Block::Component(comp) => comp.render(engine),
+            })
+            .collect();
+
+        match &self.component {
+            UiComponent::PromptBox(data) => {
+                let ctx = minijinja::context! {
+                    label => &data.label,
+                    content => &data.content,
+                    children => children_html,
+                };
+                engine
+                    .render("prompt_box", ctx)
+                    .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
+            }
+        }
+    }
 }
 
 impl Renderable for UiComponent {
