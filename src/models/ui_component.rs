@@ -18,6 +18,14 @@ pub struct ComponentBlock {
     pub children: Vec<Block>,
 }
 
+impl UiComponent {
+    pub fn required_assets(&self) -> (Vec<&'static str>, Vec<&'static str>) {
+        match self {
+            UiComponent::PromptBox(_) => (vec!["css/prompt_box.css"], vec![]),
+        }
+    }
+}
+
 impl ComponentBlock {
     pub fn render(&self, engine: &TemplateEngine) -> String {
         let children_html: String = self
@@ -100,5 +108,16 @@ label: Test Label
 "#;
         let result: Result<UiComponent, _> = serde_yaml::from_str(yaml);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn prompt_box_declares_required_assets() {
+        let comp = UiComponent::PromptBox(PromptBoxData {
+            label: "Test".to_string(),
+            content: "Content".to_string(),
+        });
+        let (css, js) = comp.required_assets();
+        assert_eq!(css, vec!["css/prompt_box.css"]);
+        assert!(js.is_empty());
     }
 }

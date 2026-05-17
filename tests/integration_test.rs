@@ -51,3 +51,41 @@ fn hybrid_markdown_swallows_yaml_and_renders_rest() {
     assert!(!html.contains("type: prompt-box"));
     assert!(!html.contains("label: My Prompt"));
 }
+
+#[test]
+fn render_no_external_links() {
+    let input = PathBuf::from("tests/fixtures/hybrid.md");
+    let output = PathBuf::from("tests/fixtures/external_test.html");
+
+    let args = CliArgs {
+        input,
+        output: output.clone(),
+    };
+
+    compiler::run_compilation(&args).unwrap();
+    let html = std::fs::read_to_string(&output).unwrap();
+    let _ = std::fs::remove_file(&output);
+
+    assert!(!html.contains(r#"href="*.css""#));
+    assert!(!html.contains(r#"src="*.js""#));
+    assert!(!html.contains(r#".css""#));
+    assert!(!html.contains(r#".js""#));
+}
+
+#[test]
+fn render_inline_styles_present() {
+    let input = PathBuf::from("tests/fixtures/hybrid.md");
+    let output = PathBuf::from("tests/fixtures/inline_styles_test.html");
+
+    let args = CliArgs {
+        input,
+        output: output.clone(),
+    };
+
+    compiler::run_compilation(&args).unwrap();
+    let html = std::fs::read_to_string(&output).unwrap();
+    let _ = std::fs::remove_file(&output);
+
+    assert!(html.contains("<style>"));
+    assert!(html.contains(".prompt-box"));
+}

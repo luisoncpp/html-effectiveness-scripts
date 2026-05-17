@@ -1,5 +1,6 @@
 use anyhow::Result;
 
+use crate::assets::AssetRegistry;
 use crate::cli::CliArgs;
 use crate::parser;
 use crate::renderer;
@@ -8,7 +9,10 @@ pub fn run_compilation(args: &CliArgs) -> Result<()> {
     let markdown = std::fs::read_to_string(&args.input)?;
     let parsed = parser::parse(&markdown)?;
     let engine = renderer::TemplateEngine::new()?;
-    let html = renderer::render_document(&parsed, &engine)?;
+    let registry = AssetRegistry::from_blocks(&parsed.blocks)
+        .with_theme(&parsed.context.theme_tokens)
+        .with_base_assets();
+    let html = renderer::render_document(&parsed, &engine, &registry)?;
     std::fs::write(&args.output, html)?;
     Ok(())
 }

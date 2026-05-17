@@ -1,6 +1,7 @@
 use anyhow::Result;
 use minijinja::{context, Environment};
 
+use crate::assets::AssetRegistry;
 use crate::models::block::Block;
 use crate::models::ui_component::ComponentBlock;
 use crate::parser::ParsedDocument;
@@ -26,9 +27,19 @@ impl TemplateEngine {
     }
 }
 
-pub fn render_document(parsed: &ParsedDocument, engine: &TemplateEngine) -> Result<String> {
+pub fn render_document(
+    parsed: &ParsedDocument,
+    engine: &TemplateEngine,
+    registry: &AssetRegistry,
+) -> Result<String> {
     let body = render_blocks(&parsed.blocks, engine);
-    engine.render("base", context! { content => body })
+    let title = parsed.context.title.as_deref().unwrap_or("Document");
+    engine.render("base", context! {
+        content => body,
+        title => title,
+        inline_styles => registry.inline_styles(),
+        inline_scripts => registry.inline_scripts(),
+    })
 }
 
 fn render_blocks(blocks: &[Block], engine: &TemplateEngine) -> String {
@@ -105,12 +116,100 @@ mod tests {
             ],
             context: DocumentContext::default(),
         };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
 
-        let result = render_document(&parsed, &engine).unwrap();
+        let result = render_document(&parsed, &engine, &registry).unwrap();
         assert!(result.contains("<h1>Title</h1>"));
         assert!(result.contains("My Label"));
         assert!(result.contains("My Content"));
         assert!(!result.contains("COMPONENT_PLACEHOLDER"));
         assert!(result.contains("<!DOCTYPE html>"));
+    }
+
+    #[test]
+    fn render_no_external_links() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![Block::Component(ComponentBlock {
+                component: UiComponent::PromptBox(PromptBoxData {
+                    label: "Label".to_string(),
+                    content: "Content".to_string(),
+                }),
+                children: vec![],
+            })],
+            context: DocumentContext::default(),
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(!html.contains(r#"href="*.css""#));
+        assert!(!html.contains(r#"src="*.js""#));
+        assert!(!html.contains(r#".css""#));
+        assert!(!html.contains(r#".js""#));
+    }
+
+    #[test]
+    fn render_inline_styles_present() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![Block::Component(ComponentBlock {
+                component: UiComponent::PromptBox(PromptBoxData {
+                    label: "Label".to_string(),
+                    content: "Content".to_string(),
+                }),
+                children: vec![],
+            })],
+            context: DocumentContext::default(),
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("<style>"));
+        assert!(html.contains(".prompt-box"));
+    }
+
+    #[test]
+    fn render_inline_scripts_present() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![],
+            context: DocumentContext::default(),
+        };
+        let mut registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        registry.scripts.insert("js/test.js".to_string());
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("<script>"));
+        assert!(html.contains("// test script content"));
+    }
+
+    #[test]
+    fn render_base_receives_title() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![],
+            context: DocumentContext {
+                title: Some("My Title".to_string()),
+                ..Default::default()
+            },
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("<title>My Title</title>"));
+    }
+
+    #[test]
+    fn render_base_receives_theme() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![],
+            context: DocumentContext {
+                theme_tokens: "clay-slate".to_string(),
+                ..Default::default()
+            },
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks)
+            .with_theme(&parsed.context.theme_tokens)
+            .with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("<style>"));
+        assert!(html.contains("--color-primary: #64748b"));
     }
 }
