@@ -35,3 +35,20 @@ fn snapshot_hybrid_markdown() {
 
     insta::assert_snapshot!(html);
 }
+
+#[test]
+fn snapshot_triage_board() {
+    let input = PathBuf::from("tests/fixtures/triage_board.md");
+    let output = PathBuf::from("tests/fixtures/triage_board_snapshot.html");
+
+    let args = CliArgs {
+        input,
+        output: output.clone(),
+    };
+
+    compiler::run_compilation(&args).unwrap();
+    let html = std::fs::read_to_string(&output).unwrap();
+    let _ = std::fs::remove_file(&output);
+
+    insta::assert_snapshot!(html);
+}

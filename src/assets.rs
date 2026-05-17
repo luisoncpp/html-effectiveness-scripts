@@ -93,6 +93,8 @@ fn resolve_asset(path: &str) -> Option<&'static str> {
     match path {
         "css/base.css" => Some(include_str!("../assets/css/base.css")),
         "css/prompt_box.css" => Some(include_str!("../assets/css/prompt_box.css")),
+        "css/triage_board.css" => Some(include_str!("../assets/css/triage_board.css")),
+        "js/triage_board.js" => Some(include_str!("../assets/js/triage_board.js")),
         "tokens/clay-slate.css" => Some(include_str!("../assets/tokens/clay-slate.css")),
         _ => None,
     }

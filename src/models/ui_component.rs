@@ -3,6 +3,7 @@ use serde::Deserialize;
 use super::base::Renderable;
 use super::block::Block;
 use super::components::prompt_box::PromptBoxData;
+use super::components::triage_board::TriageBoardData;
 use crate::renderer::TemplateEngine;
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -10,6 +11,8 @@ use crate::renderer::TemplateEngine;
 pub enum UiComponent {
     #[serde(rename = "prompt-box")]
     PromptBox(PromptBoxData),
+    #[serde(rename = "triage-board")]
+    TriageBoard(TriageBoardData),
 }
 
 #[derive(Debug, PartialEq)]
@@ -22,6 +25,9 @@ impl UiComponent {
     pub fn required_assets(&self) -> (Vec<&'static str>, Vec<&'static str>) {
         match self {
             UiComponent::PromptBox(_) => (vec!["css/prompt_box.css"], vec![]),
+            UiComponent::TriageBoard(_) => {
+                (vec!["css/triage_board.css"], vec!["js/triage_board.js"])
+            }
         }
     }
 }
@@ -48,6 +54,18 @@ impl ComponentBlock {
                     .render("prompt_box", ctx)
                     .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
             }
+            UiComponent::TriageBoard(data) => {
+                let ctx = minijinja::context! {
+                    eyebrow => &data.eyebrow,
+                    title => &data.title,
+                    subtitle => &data.subtitle,
+                    hintline => &data.hintline,
+                    children => children_html,
+                };
+                engine
+                    .render("triage_board", ctx)
+                    .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
+            }
         }
     }
 }
@@ -62,6 +80,17 @@ impl Renderable for UiComponent {
                 };
                 engine
                     .render("prompt_box", ctx)
+                    .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
+            }
+            UiComponent::TriageBoard(data) => {
+                let ctx = minijinja::context! {
+                    eyebrow => &data.eyebrow,
+                    title => &data.title,
+                    subtitle => &data.subtitle,
+                    hintline => &data.hintline,
+                };
+                engine
+                    .render("triage_board", ctx)
                     .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
             }
         }

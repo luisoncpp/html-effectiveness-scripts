@@ -1,4 +1,5 @@
 <div class="prompt-box">
     <div class="prompt-box__label">{{ label }}</div>
-    <div class="prompt-box__content">{{ content }}</div>
+    <div class="prompt-box__content">{{ content }}</div>{% if children %}
+    <div class="prompt-box__children">{{ children }}</div>{% endif %}
 </div>

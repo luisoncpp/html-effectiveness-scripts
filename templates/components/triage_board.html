@@ -1,0 +1,19 @@
+<div class="wrap">
+  <header>
+    <div class="eyebrow">{{ eyebrow }}</div>
+    <h1>{{ title }}</h1>
+    <p class="sub">{{ subtitle }}</p>
+    <div class="hintline">{{ hintline }}</div>
+  </header>
+
+  <div class="toolbar">
+    <div class="summary" id="summary"></div>
+    <div class="spacer"></div>
+    <button class="filter-active" id="filterBadge"></button>
+    <button class="ghost" id="resetBtn">Reset</button>
+    <button class="primary" id="copyBtn">Copy as markdown</button>
+  </div>
+
+  <div class="board" id="board"></div>
+</div>
+{{ children }}

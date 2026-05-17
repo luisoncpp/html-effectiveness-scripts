@@ -18,12 +18,20 @@ impl TemplateEngine {
             "prompt_box",
             include_str!("../templates/components/prompt_box.html"),
         )?;
+        env.add_template(
+            "triage_board",
+            include_str!("../templates/components/triage_board.html"),
+        )?;
         Ok(Self { env })
     }
 
     pub fn render(&self, name: &str, ctx: minijinja::Value) -> Result<String> {
         let template = self.env.get_template(name)?;
         Ok(template.render(ctx)?)
+    }
+
+    pub fn env(&self) -> &Environment<'static> {
+        &self.env
     }
 }
 
@@ -37,6 +45,8 @@ pub fn render_document(
     engine.render("base", context! {
         content => body,
         title => title,
+        layout => parsed.context.layout_wrapper.to_string(),
+        theme => &parsed.context.theme_tokens,
         inline_styles => registry.inline_styles(),
         inline_scripts => registry.inline_scripts(),
     })
@@ -211,5 +221,64 @@ mod tests {
         let html = render_document(&parsed, &engine, &registry).unwrap();
         assert!(html.contains("<style>"));
         assert!(html.contains("--color-primary: #64748b"));
+    }
+
+    #[test]
+    fn render_prompt_box_produces_html() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![Block::Component(ComponentBlock {
+                component: UiComponent::PromptBox(PromptBoxData {
+                    label: "My Label".to_string(),
+                    content: "My Content".to_string(),
+                }),
+                children: vec![],
+            })],
+            context: DocumentContext::default(),
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("<div class=\"prompt-box\">"));
+        assert!(html.contains("My Label"));
+        assert!(html.contains("My Content"));
+    }
+
+    #[test]
+    fn render_parent_with_children_slot() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![Block::Component(ComponentBlock {
+                component: UiComponent::PromptBox(PromptBoxData {
+                    label: "Parent".to_string(),
+                    content: "Parent content".to_string(),
+                }),
+                children: vec![Block::Component(ComponentBlock {
+                    component: UiComponent::PromptBox(PromptBoxData {
+                        label: "Child".to_string(),
+                        content: "Child content".to_string(),
+                    }),
+                    children: vec![],
+                })],
+            })],
+            context: DocumentContext::default(),
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("Parent"));
+        assert!(html.contains("Child"));
+    }
+
+    #[test]
+    fn render_prose_passes_through() {
+        let engine = TemplateEngine::new().unwrap();
+        let raw = "<h1>Title</h1>\n<p>Paragraph</p>\n";
+        let parsed = ParsedDocument {
+            blocks: vec![Block::Prose(raw.to_string())],
+            context: DocumentContext::default(),
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("<h1>Title</h1>"));
+        assert!(html.contains("<p>Paragraph</p>"));
     }
 }

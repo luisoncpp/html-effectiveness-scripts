@@ -1,5 +1,6 @@
 ---
 source: tests/snapshot_test.rs
+assertion_line: 36
 expression: html
 ---
 <!DOCTYPE html>
@@ -84,7 +85,7 @@ em {
 
 </style>
 </head>
-<body>
+<body class="layout-reading-column">
     <main>
         <h1>Hello World</h1>
 <p>This is a basic test paragraph.</p>

@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, PartialEq, Default)]
@@ -18,4 +20,14 @@ pub enum LayoutType {
     Wide,
     #[serde(rename = "canvas")]
     Canvas,
+}
+
+impl fmt::Display for LayoutType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            LayoutType::ReadingColumn => write!(f, "reading-column"),
+            LayoutType::Wide => write!(f, "wide"),
+            LayoutType::Canvas => write!(f, "canvas"),
+        }
+    }
 }
