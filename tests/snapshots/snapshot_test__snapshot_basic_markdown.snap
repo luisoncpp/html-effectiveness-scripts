@@ -1,0 +1,100 @@
+---
+source: tests/snapshot_test.rs
+expression: html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    :root {
+        --color-primary: #2563eb;
+        --color-bg: #ffffff;
+        --color-surface: #f8fafc;
+        --color-text: #1e293b;
+        --color-text-muted: #64748b;
+        --color-border: #e2e8f0;
+        --radius: 0.5rem;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--color-text);
+        max-width: 65ch;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        background: var(--color-bg);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+        line-height: 1.25;
+    }
+
+    p {
+        margin: 0 0 1em;
+    }
+
+    ul, ol {
+        margin: 0 0 1em;
+        padding-left: 1.5em;
+    }
+
+    li {
+        margin-bottom: 0.25em;
+    }
+
+    strong {
+        font-weight: 600;
+    }
+
+    em {
+        font-style: italic;
+    }
+
+    .prompt-box {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        background: var(--color-surface);
+        padding: 1.25rem;
+        margin: 1.5rem 0;
+        box-shadow: var(--shadow);
+    }
+
+    .prompt-box__label {
+        font-weight: 600;
+        color: var(--color-primary);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .prompt-box__content {
+        color: var(--color-text);
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.9375rem;
+    }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Hello World</h1>
+<p>This is a basic test paragraph.</p>
+<h2>Section Two</h2>
+<p>Another paragraph with <strong>bold</strong> and <em>italic</em> text.</p>
+<ul>
+<li>List item one</li>
+<li>List item two</li>
+<li>List item three</li>
+</ul>
+
+    </main>
+</body>
+</html>

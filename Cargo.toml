@@ -9,3 +9,7 @@ pulldown-cmark = "0.12"
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 serde_yaml = "0.9"
+minijinja = "2"
+
+[dev-dependencies]
+insta = "1"

@@ -25,7 +25,11 @@ pub fn parse(markdown: &str) -> Result<ParsedDocument> {
                 in_yaml = false;
                 let component = serde_yaml::from_str(&yaml_buffer)
                     .with_context(|| "Failed to deserialize YAML component")?;
+                let index = components.len();
                 components.push(component);
+                events.push(Event::Html(
+                    format!("<!-- COMPONENT_PLACEHOLDER_{} -->", index).into(),
+                ));
             }
             Event::Text(text) if in_yaml => {
                 yaml_buffer.push_str(&text);

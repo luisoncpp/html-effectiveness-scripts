@@ -2,13 +2,14 @@ use anyhow::Result;
 
 use crate::cli::CliArgs;
 use crate::parser;
+use crate::renderer;
 
 pub fn run_compilation(args: &CliArgs) -> Result<()> {
     let markdown = std::fs::read_to_string(&args.input)?;
     let parsed = parser::parse(&markdown)?;
-    // Components extracted for rendering in Phase 3
-    let _ = parsed.components;
-    std::fs::write(&args.output, parsed.html)?;
+    let engine = renderer::TemplateEngine::new()?;
+    let html = renderer::render_document(&parsed, &engine)?;
+    std::fs::write(&args.output, html)?;
     Ok(())
 }
 
