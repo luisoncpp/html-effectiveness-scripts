@@ -4,6 +4,7 @@ use super::base::Renderable;
 use super::block::Block;
 use super::components::prompt_box::PromptBoxData;
 use super::components::triage_board::TriageBoardData;
+use super::components::ComponentStrategy;
 use crate::renderer::TemplateEngine;
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -22,13 +23,23 @@ pub struct ComponentBlock {
 }
 
 impl UiComponent {
-    pub fn required_assets(&self) -> (Vec<&'static str>, Vec<&'static str>) {
+    fn strategy(&self) -> &dyn ComponentStrategy {
         match self {
-            UiComponent::PromptBox(_) => (vec!["css/prompt_box.css"], vec![]),
-            UiComponent::TriageBoard(_) => {
-                (vec!["css/triage_board.css"], vec!["js/triage_board.js"])
-            }
+            UiComponent::PromptBox(data) => data,
+            UiComponent::TriageBoard(data) => data,
         }
+    }
+
+    pub fn required_assets(&self) -> (Vec<&'static str>, Vec<&'static str>) {
+        self.strategy().required_assets()
+    }
+
+    fn template_name(&self) -> &'static str {
+        self.strategy().template_name()
+    }
+
+    fn render_context(&self, children_html: &str) -> minijinja::Value {
+        self.strategy().render_context(children_html)
     }
 }
 
@@ -43,57 +54,21 @@ impl ComponentBlock {
             })
             .collect();
 
-        match &self.component {
-            UiComponent::PromptBox(data) => {
-                let ctx = minijinja::context! {
-                    label => &data.label,
-                    content => &data.content,
-                    children => children_html,
-                };
-                engine
-                    .render("prompt_box", ctx)
-                    .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
-            }
-            UiComponent::TriageBoard(data) => {
-                let ctx = minijinja::context! {
-                    eyebrow => &data.eyebrow,
-                    title => &data.title,
-                    subtitle => &data.subtitle,
-                    hintline => &data.hintline,
-                    children => children_html,
-                };
-                engine
-                    .render("triage_board", ctx)
-                    .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
-            }
-        }
+        let ctx = self.component.render_context(&children_html);
+        let template_name = self.component.template_name();
+        engine
+            .render(template_name, ctx)
+            .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
     }
 }
 
 impl Renderable for UiComponent {
     fn render(&self, engine: &TemplateEngine) -> String {
-        match self {
-            UiComponent::PromptBox(data) => {
-                let ctx = minijinja::context! {
-                    label => &data.label,
-                    content => &data.content,
-                };
-                engine
-                    .render("prompt_box", ctx)
-                    .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
-            }
-            UiComponent::TriageBoard(data) => {
-                let ctx = minijinja::context! {
-                    eyebrow => &data.eyebrow,
-                    title => &data.title,
-                    subtitle => &data.subtitle,
-                    hintline => &data.hintline,
-                };
-                engine
-                    .render("triage_board", ctx)
-                    .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
-            }
-        }
+        let ctx = self.render_context("");
+        let template_name = self.template_name();
+        engine
+            .render(template_name, ctx)
+            .unwrap_or_else(|e| format!("<!-- render error: {} -->", e))
     }
 }
 

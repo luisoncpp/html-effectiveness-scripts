@@ -82,6 +82,7 @@ fn render_component(comp: &ComponentBlock, engine: &TemplateEngine) -> String {
 mod tests {
     use super::*;
     use crate::models::components::prompt_box::PromptBoxData;
+    use crate::models::components::triage_board::TriageBoardData;
     use crate::models::document_context::DocumentContext;
     use crate::models::ui_component::{ComponentBlock, UiComponent};
 
@@ -266,6 +267,34 @@ mod tests {
         let html = render_document(&parsed, &engine, &registry).unwrap();
         assert!(html.contains("Parent"));
         assert!(html.contains("Child"));
+    }
+
+    #[test]
+    fn render_cross_component_children() {
+        let engine = TemplateEngine::new().unwrap();
+        let parsed = ParsedDocument {
+            blocks: vec![Block::Component(ComponentBlock {
+                component: UiComponent::TriageBoard(TriageBoardData {
+                    eyebrow: "Sprint".to_string(),
+                    title: "My Board".to_string(),
+                    subtitle: "Items".to_string(),
+                    hintline: "Drag here".to_string(),
+                }),
+                children: vec![Block::Component(ComponentBlock {
+                    component: UiComponent::PromptBox(PromptBoxData {
+                        label: "Note".to_string(),
+                        content: "Remember this".to_string(),
+                    }),
+                    children: vec![],
+                })],
+            })],
+            context: DocumentContext::default(),
+        };
+        let registry = AssetRegistry::from_blocks(&parsed.blocks).with_base_assets();
+        let html = render_document(&parsed, &engine, &registry).unwrap();
+        assert!(html.contains("My Board"));
+        assert!(html.contains("Note"));
+        assert!(html.contains("Remember this"));
     }
 
     #[test]

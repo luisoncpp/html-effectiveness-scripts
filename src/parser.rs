@@ -132,6 +132,7 @@ fn parse_child_value(value: serde_yaml::Value) -> Result<Block> {
 mod tests {
     use super::*;
     use crate::models::components::prompt_box::PromptBoxData;
+    use crate::models::components::triage_board::TriageBoardData;
     use crate::models::document_context::LayoutType;
 
     #[test]
@@ -267,6 +268,102 @@ children:
             UiComponent::PromptBox(PromptBoxData {
                 label: "Child".to_string(),
                 content: "Child content".to_string(),
+            })
+        );
+        assert!(child.children.is_empty());
+    }
+
+    #[test]
+    fn parse_deep_nesting() {
+        let markdown = r#"```yaml
+type: prompt-box
+label: Grandparent
+content: A
+children:
+  - type: prompt-box
+    label: Parent
+    content: B
+    children:
+      - type: prompt-box
+        label: Child
+        content: C
+```"#;
+
+        let result = parse(markdown).unwrap();
+        assert_eq!(result.blocks.len(), 1);
+        let grandparent = match &result.blocks[0] {
+            Block::Component(comp) => comp,
+            _ => panic!("Expected component block"),
+        };
+        assert_eq!(grandparent.children.len(), 1);
+
+        let parent = match &grandparent.children[0] {
+            Block::Component(comp) => comp,
+            _ => panic!("Expected nested component"),
+        };
+        assert_eq!(
+            parent.component,
+            UiComponent::PromptBox(PromptBoxData {
+                label: "Parent".to_string(),
+                content: "B".to_string(),
+            })
+        );
+        assert_eq!(parent.children.len(), 1);
+
+        let child = match &parent.children[0] {
+            Block::Component(comp) => comp,
+            _ => panic!("Expected grandchild component"),
+        };
+        assert_eq!(
+            child.component,
+            UiComponent::PromptBox(PromptBoxData {
+                label: "Child".to_string(),
+                content: "C".to_string(),
+            })
+        );
+        assert!(child.children.is_empty());
+    }
+
+    #[test]
+    fn parse_cross_component_nesting() {
+        let markdown = r#"```yaml
+type: triage-board
+eyebrow: Sprint 1
+title: Board
+subtitle: Tasks
+hintline: Drag items
+children:
+  - type: prompt-box
+    label: Note
+    content: Something to remember
+```"#;
+
+        let result = parse(markdown).unwrap();
+        assert_eq!(result.blocks.len(), 1);
+        let board = match &result.blocks[0] {
+            Block::Component(comp) => comp,
+            _ => panic!("Expected component block"),
+        };
+        assert_eq!(
+            board.component,
+            UiComponent::TriageBoard(TriageBoardData {
+                eyebrow: "Sprint 1".to_string(),
+                title: "Board".to_string(),
+                subtitle: "Tasks".to_string(),
+                hintline: "Drag items".to_string(),
+            })
+        );
+        assert_eq!(board.children.len(), 1);
+
+        let child = match &board.children[0] {
+            Block::Component(comp) => comp,
+            _ => panic!("Expected nested component"),
+        };
+        assert_eq!(
+            child.component,
+            UiComponent::PromptBox(PromptBoxData {
+                label: "Note".to_string(),
+                content: "Something to remember".to_string(),
             })
         );
         assert!(child.children.is_empty());

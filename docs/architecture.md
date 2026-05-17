@@ -116,18 +116,25 @@ The compiler executes the following stages in sequence inside `compiler::run_com
 
 ### `models::ui_component`
 
-* **Responsibility:** Central Strategy Router for YAML deserialization and asset declarations.
+* **Responsibility:** Thin serde-enabled enum wrapping component strategies. No per-variant behavior lives here.
 * **Enum:** `UiComponent` uses `#[serde(tag = "type")]` for internally tagged polymorphism.
 * **Variants:** `PromptBox(PromptBoxData)`, `TriageBoard(TriageBoardData)`.
 * **Struct:** `ComponentBlock { component: UiComponent, children: Vec<Block> }` wraps a component with its nested AST.
-* **`required_assets()`** returns `(Vec<&str>, Vec<&str>)` — CSS paths and JS paths declared by each variant. Used by the `AssetRegistry` to collect only the assets actually needed for a given document.
+* **Dispatch:** All methods (`required_assets()`, `template_name()`, `render_context()`) delegate to the `ComponentStrategy` trait via a single `strategy()` helper match. Adding a new component requires only adding the enum variant + module — no render or asset logic changes in this file.
 * **Fail-fast:** Unknown types or missing required fields result in a deserialization `Err`, which propagates up and halts compilation.
+
+### `models::components/`
+
+* **Responsibility:** Each component module defines its data struct and implements the `ComponentStrategy` trait locally.
+* **Trait:** `ComponentStrategy { required_assets(), template_name(), render_context() }` — every component owns its asset declarations, template binding, and minijinja context construction.
+* **Modules:** `prompt_box.rs` (PromptBoxData), `triage_board.rs` (TriageBoardData).
+* **Key Design Decision:** Component behavior is colocated with component data. Adding a new component touches only its own file and `components/mod.rs` (module declaration).
 
 ### `models::base.rs`
 
-* **Responsibility:** Defines the contract between data models and the templating engine.
+* **Responsibility:** Defines the `Renderable` trait for standalone rendering (without children).
 * **Trait:** `Renderable { fn render(&self, engine: &TemplateEngine) -> String; }`
-* **Implementation:** Implemented on `UiComponent` and `ComponentBlock` (which recursively renders children and passes them as a `children` template variable).
+* **Implementation:** `UiComponent` delegates to `ComponentStrategy::render_context()` and `template_name()`, avoiding per-variant code.
 
 ### `renderer.rs`
 
@@ -160,12 +167,17 @@ The output HTML is fully self-contained. Templates live in `templates/` and are 
 
 ## 6. Component Strategy Pattern
 
+Each component is a self-contained strategy module. `UiComponent` is a thin enum that delegates all behavior to the `ComponentStrategy` trait.
+
 Adding a new UI component requires these steps:
 
-1. **Model:** Create a data struct in `src/models/components/`, add it as a variant to `UiComponent`, and declare its `required_assets()`.
-2. **Template:** Add a `.html` file in `templates/components/` with a `{{ children }}` slot.
-3. **Assets:** Add `.css` (and optionally `.js`) files in `assets/css/` and `assets/js/`, and register the paths in `assets.rs`'s `resolve_asset()` function.
-4. **Render:** Implement rendering for the new variant in `ComponentBlock::render()` and `UiComponent::render()`.
+1. **Model:** Create a data struct in `src/models/components/<name>.rs`, implement `ComponentStrategy` (declaring assets, template name, and context builder).
+2. **Enum:** Add the variant to `UiComponent` in `ui_component.rs` (one line) and update the `strategy()` match (one line).
+3. **Module:** Register the module in `components/mod.rs`.
+4. **Template:** Add a `.html` file in `templates/components/` with a `{{ children }}` slot, and register it in `TemplateEngine::new()` in `renderer.rs`.
+5. **Assets:** Add `.css` (and optionally `.js`) files in `assets/css/` and `assets/js/`, and register the paths in `assets.rs`'s `resolve_asset()` function.
+
+**No per-variant match arms in `ComponentBlock::render()`, `UiComponent::render()`, or `required_assets()`** — the trait dispatch handles it generically.
 
 ## 7. Testing Strategy
 
@@ -186,7 +198,8 @@ Adding a new UI component requires these steps:
 | **Block-based AST** (`Block::Prose` / `Block::Component`) | Preserves document order without placeholder tokens; prose is pre-rendered to HTML at parse time. Enables arbitrary nesting via `children: Vec<Block>`. |
 | **YAML frontmatter for document config** | Cleanly separates document-level settings (title, layout, theme) from content. Uses standard `---` delimited blocks compatible with common Markdown tools. |
 | **`include_str!` for all templates and assets** | Produces a single static binary with no runtime file I/O for templates or assets. |
-| **Internally tagged enum** (`#[serde(tag = "type")]`) | Keeps YAML concise and human-readable; maps cleanly to the Strategy Pattern in Rust. |
+| **Internally tagged enum** (`#[serde(tag = "type")]`) | Keeps YAML concise and human-readable; `type` field drives serde deserialization without custom code. |
+| **`ComponentStrategy` trait per component** | Each component implements its own behavior (assets, template binding, context) in its own file. `UiComponent` is a thin enum that dispatches via a single `strategy()` match. Avoids god-class anti-pattern. |
 | **Self-contained CSS & JS** | Eliminates external asset dependencies; the generated HTML is a single portable file. |
 | **Asset registry with BTreeSet deduplication** | Only the assets actually used by the document's components are inlined. Theme tokens are additive on top of the base CSS cascade. |
 | **Layout system** (reading-column / wide / canvas) | Allows components like triage-board to override the default reading-width constraint via frontmatter, enabling full-width dashboards within the same compiler. |

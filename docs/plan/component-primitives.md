@@ -25,6 +25,12 @@ tabs:
 
 ```
 
+**Output Goal References:**
+- [`output_goal/17-pr-writeup.html`](../../output_goal/17-pr-writeup.html) — Expandable file-tour panels with diff highlighting (`.file` / `.code`)
+- [`output_goal/01-exploration-code-approaches.html`](../../output_goal/01-exploration-code-approaches.html) — Approach cards containing dark code blocks
+- [`output_goal/16-implementation-plan.html`](../../output_goal/16-implementation-plan.html) — Side-by-side code grid (`.code-grid`) with SQL and TypeScript snippets
+- [`output_goal/12-incident-report.html`](../../output_goal/12-incident-report.html) — Inline diff panel (`.code-panel`) showing root-cause config change
+
 ## 2. `SvgCanvas`
 
 **Purpose:** A declarative wrapper for vector graphics. Can be used for flowchart nodes, architecture diagrams, or interactive math/physics sandboxes.
@@ -47,6 +53,12 @@ elements:
 
 ```
 
+**Output Goal References:**
+- [`output_goal/13-flowchart-diagram.html`](../../output_goal/13-flowchart-diagram.html) — Interactive pipeline flowchart with nodes, edges, arrow markers, and a sticky detail panel
+- [`output_goal/16-implementation-plan.html`](../../output_goal/16-implementation-plan.html) — Data-flow diagram (`.diagram svg`) showing optimistic-write paths
+- [`output_goal/11-status-report.html`](../../output_goal/11-status-report.html) — Inline SVG bar chart inside a chart panel
+- [`output_goal/10-svg-illustrations.html`](../../output_goal/10-svg-illustrations.html) — Standalone vector illustrations and iconography
+
 ## 3. `DataGrid` (Rich Table)
 
 **Purpose:** A tabular layout that supports rendering sub-components (badges, risk dots, icons) inside its cells, rather than just plain text.
@@ -61,6 +73,12 @@ rows:
   - ["Drag & Drop", { type: badge, label: "WIP", color: "yellow" }, { type: dot, color: "high" }]
 
 ```
+
+**Output Goal References:**
+- [`output_goal/11-status-report.html`](../../output_goal/11-status-report.html) — Shipped table (`.shipped`) with PR links, authors, and risk-dot badges
+- [`output_goal/12-incident-report.html`](../../output_goal/12-incident-report.html) — Impact table and action-items grid with avatars, checkboxes, and due dates
+- [`output_goal/16-implementation-plan.html`](../../output_goal/16-implementation-plan.html) — Risks & mitigations table with severity badges (`.sev.high`, `.sev.med`, `.sev.low`)
+- [`output_goal/06-component-variants.html`](../../output_goal/06-component-variants.html) — Variant matrix showing different component states side-by-side
 
 ## 4. `BoardLayout` (Spatial Container)
 
@@ -81,6 +99,11 @@ columns:
 
 ```
 
+**Output Goal References:**
+- [`output_goal/18-editor-triage-board.html`](../../output_goal/18-editor-triage-board.html) — Kanban board (`.board`) with four columns, drag-and-drop, and sticky column headers
+- [`output_goal/09-slide-deck.html`](../../output_goal/09-slide-deck.html) — Full-screen scroll-snapping slide deck (`.slide`) with six distinct layouts
+- [`output_goal/02-exploration-visual-designs.html`](../../output_goal/02-exploration-visual-designs.html) — CSS artboard grid for visual design explorations
+
 ## 5. `Card` (Atomic Unit)
 
 **Purpose:** The standard boxed container. Often nested inside a `BoardLayout` or `DataGrid`. Can contain standard markdown prose or smaller UI elements.
@@ -96,6 +119,12 @@ children:
     content: "Requires restructuring the `pulldown-cmark` event loop."
 
 ```
+
+**Output Goal References:**
+- [`output_goal/18-editor-triage-board.html`](../../output_goal/18-editor-triage-board.html) — Ticket cards (`.ticket`) with tags, estimates, owners, and hover states inside a kanban board
+- [`output_goal/11-status-report.html`](../../output_goal/11-status-report.html) — Stat cards (`.stat-card`) in a four-column summary band, including a warning variant
+- [`output_goal/01-exploration-code-approaches.html`](../../output_goal/01-exploration-code-approaches.html) — Approach cards containing code panels, tradeoff tables, and chip footers
+- [`output_goal/16-implementation-plan.html`](../../output_goal/16-implementation-plan.html) — Summary cells (`.summary .cell`) and mockup cards (`.mock`) with labeled borders
 
 ## 6. `Timeline`
 
@@ -116,6 +145,10 @@ steps:
 
 ```
 
+**Output Goal References:**
+- [`output_goal/16-implementation-plan.html`](../../output_goal/16-implementation-plan.html) — Milestone timeline (`.milestones`) with colored dots, connecting lines, tags, and date ranges
+- [`output_goal/12-incident-report.html`](../../output_goal/12-incident-report.html) — Incident timeline (`.timeline`) with impact/recovery dot states and timestamp labels
+
 ## 7. `Notice` (Callout / Sticky Nav)
 
 **Purpose:** Contextual UI alerts, definition boxes, or sticky navigation sidebars.
@@ -130,6 +163,12 @@ content: |
   **Breaking Change:** The parser now expects multiple blocks.
 
 ```
+
+**Output Goal References:**
+- [`output_goal/01-exploration-code-approaches.html`](../../output_goal/01-exploration-code-approaches.html) — Recommendation callout (`.reco`) with left border accent
+- [`output_goal/17-pr-writeup.html`](../../output_goal/17-pr-writeup.html) — TL;DR box (`.tldr`) with left border accent and prompt box (`.prompt-box`) with label
+- [`output_goal/16-implementation-plan.html`](../../output_goal/16-implementation-plan.html) — Prompt box and open-question callouts (`.q`) with left border accent
+- [`output_goal/12-incident-report.html`](../../output_goal/12-incident-report.html) — Dark TL;DR panel (`.tldr`) with inverted colors and fixed TOC sidebar (`.toc`)
 
 
 

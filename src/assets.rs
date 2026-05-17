@@ -104,6 +104,7 @@ fn resolve_asset(path: &str) -> Option<&'static str> {
 mod tests {
     use super::*;
     use crate::models::components::prompt_box::PromptBoxData;
+    use crate::models::components::triage_board::TriageBoardData;
     use crate::models::ui_component::{ComponentBlock, UiComponent};
 
     #[test]
@@ -144,6 +145,29 @@ mod tests {
         })];
         let reg = AssetRegistry::from_blocks(&blocks);
         assert!(reg.stylesheets.contains("css/prompt_box.css"));
+    }
+
+    #[test]
+    fn registry_cross_component_assets() {
+        let blocks = vec![Block::Component(ComponentBlock {
+            component: UiComponent::TriageBoard(TriageBoardData {
+                eyebrow: "Sprint".to_string(),
+                title: "Board".to_string(),
+                subtitle: "Items".to_string(),
+                hintline: "Drag".to_string(),
+            }),
+            children: vec![Block::Component(ComponentBlock {
+                component: UiComponent::PromptBox(PromptBoxData {
+                    label: "Note".to_string(),
+                    content: "Text".to_string(),
+                }),
+                children: vec![],
+            })],
+        })];
+        let reg = AssetRegistry::from_blocks(&blocks);
+        assert!(reg.stylesheets.contains("css/triage_board.css"));
+        assert!(reg.stylesheets.contains("css/prompt_box.css"));
+        assert!(reg.scripts.contains("js/triage_board.js"));
     }
 
     #[test]
