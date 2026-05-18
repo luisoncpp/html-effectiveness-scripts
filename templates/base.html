@@ -7,9 +7,17 @@
     {{ inline_styles }}
 </head>
 <body class="layout-{{ layout }}">
+    {% if layout == "wide" or layout == "reading-column" %}
+    <div class="page">
+        <main>
+            {{ content }}
+        </main>
+    </div>
+    {% else %}
     <main>
         {{ content }}
     </main>
+    {% endif %}
     {{ inline_scripts }}
 </body>
 </html>

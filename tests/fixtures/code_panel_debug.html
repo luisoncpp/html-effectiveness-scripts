@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+:root {
+    --ivory: #FAF9F5;
+    --slate: #141413;
+    --clay: #D97757;
+    --clay-d: #B85C3E;
+    --oat: #E3DACC;
+    --olive: #788C5D;
+    --rust: #B04A3F;
+    --gray-50: #F0EEE6;
+    --gray-150: #F0EEE6;
+    --gray-200: #D1CFC5;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --gray-800: #3D3D3A;
+    --white: #ffffff;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--ivory);
+    color: var(--gray-700);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+.layout-reading-column .page {
+    max-width: 65ch;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.layout-wide .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+}
+
+h1, h2, h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--slate);
+}
+
+h1 {
+    font-size: 2.25rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5em;
+}
+
+h2 {
+    font-size: 1.625rem;
+    letter-spacing: -0.01em;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+h3 {
+    font-size: 1.25rem;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+}
+
+h4, h5, h6 {
+    font-family: var(--sans);
+    font-weight: 600;
+    color: var(--slate);
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+    line-height: 1.3;
+}
+
+p {
+    margin: 0 0 1em;
+}
+
+ul, ol {
+    margin: 0 0 1em;
+    padding-left: 1.5em;
+}
+
+li {
+    margin-bottom: 0.25em;
+}
+
+strong {
+    font-weight: 600;
+    color: var(--slate);
+}
+
+em {
+    font-style: italic;
+}
+
+a {
+    color: var(--clay);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: var(--clay-d);
+}
+
+code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: var(--gray-150);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+pre {
+    font-family: var(--mono);
+    background: var(--slate);
+    color: #E8E6DE;
+    padding: 18px 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+blockquote {
+    border-left: 3px solid var(--clay);
+    padding-left: 1em;
+    margin: 0 0 1em;
+    color: var(--gray-500);
+}
+
+hr {
+    border: none;
+    border-top: 1.5px solid var(--gray-300);
+    margin: 2em 0;
+}
+
+.code-panel {
+    /* preserved for test compatibility */
+}
+
+.code-panel__tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem 0;
+    background: var(--ivory);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.code-panel__tab {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    color: var(--gray-500);
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.code-panel__tab:hover {
+    background: var(--white);
+    color: var(--slate);
+}
+
+.code-panel__tab--active {
+    background: var(--white);
+    color: var(--clay);
+    box-shadow: inset 0 2px 0 0 var(--clay);
+}
+
+.code-panel__content {
+    /* preserved for test compatibility */
+}
+
+.code-panel__panel {
+    display: none;
+}
+
+.code-panel__panel--active {
+    display: block;
+}
+
+.file-card {
+    border: 1.5px solid var(--gray-300);
+    border-radius: 12px;
+    background: #fff;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.file-head {
+    padding: 16px 20px;
+    border-bottom: 1.5px solid var(--gray-150);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.file-path {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--slate);
+}
+
+.file-delta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+.file-delta .add {
+    color: var(--olive);
+}
+
+.file-delta .del {
+    color: var(--rust);
+}
+
+.risk-tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.risk-tag.safe {
+    background: rgba(120, 140, 93, 0.15);
+    color: var(--olive);
+}
+
+.risk-tag.medium {
+    background: var(--oat);
+    color: #7A6A4F;
+}
+
+.risk-tag.attention {
+    background: rgba(217, 119, 87, 0.15);
+    color: var(--clay);
+}
+
+.diff {
+    background: var(--slate);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+}
+
+.diff-row {
+    display: grid;
+    grid-template-columns: 48px 18px 1fr;
+    align-items: baseline;
+    padding: 0 14px 0 0;
+    white-space: pre;
+}
+
+.diff-row .ln {
+    text-align: right;
+    padding-right: 14px;
+    color: var(--gray-500);
+    user-select: none;
+}
+
+.diff-row .mark {
+    text-align: center;
+    color: var(--gray-500);
+}
+
+.diff-row .code {
+    color: #E8E6DC;
+}
+
+.diff-row.ctx .code {
+    color: #B8B6AC;
+}
+
+.diff-row.add {
+    background: rgba(120, 140, 93, 0.15);
+}
+
+.diff-row.add .mark {
+    color: var(--olive);
+}
+
+.diff-row.del {
+    background: rgba(176, 74, 63, 0.15);
+}
+
+.diff-row.del .mark {
+    color: var(--rust);
+}
+
+</style>
+</head>
+<body class="layout-reading-column">
+    
+    <div class="page">
+        <main>
+            <h1>Code Panel Fixture</h1>
+<p>This fixture tests the code-panel component.</p>
+<!-- render error: unknown method: string has no method named split (in code_panel:26) -->
+<p>Some trailing paragraph.</p>
+
+        </main>
+    </div>
+    
+    <script>
+(function () {
+  document.querySelectorAll('.code-panel').forEach(function (panel) {
+    panel.querySelectorAll('.code-panel__tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = btn.dataset.tab;
+        panel.querySelectorAll('.code-panel__tab').forEach(function (b) { b.classList.remove('code-panel__tab--active'); });
+        panel.querySelectorAll('.code-panel__panel').forEach(function (p) { p.classList.remove('code-panel__panel--active'); });
+        btn.classList.add('code-panel__tab--active');
+        var p = panel.querySelector('.code-panel__panel[data-panel="' + idx + '"]');
+        if (p) p.classList.add('code-panel__panel--active');
+      });
+    });
+  });
+})();
+
+</script>
+</body>
+</html>

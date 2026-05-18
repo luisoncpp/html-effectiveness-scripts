@@ -1,0 +1,232 @@
+.flowchart-sheet {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.flowchart-sheet header {
+  margin-bottom: 40px;
+}
+
+.flowchart-sheet .eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+}
+
+.flowchart-sheet h1 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 34px;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: var(--slate);
+}
+
+.flowchart-sheet .lead {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--gray-700);
+  max-width: 640px;
+}
+
+.flowchart-sheet .lead code {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.flowchart-sheet .layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 920px) {
+  .flowchart-sheet .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.flowchart-sheet .canvas {
+  border: 1.5px solid var(--gray-300);
+  border-radius: 14px;
+  background: #fff;
+  padding: 28px;
+  overflow-x: auto;
+}
+
+.flowchart-sheet svg.flow {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.flowchart-sheet .flow text {
+  font-family: var(--mono);
+  font-size: 12px;
+  fill: var(--slate);
+  pointer-events: none;
+}
+
+.flowchart-sheet .flow .sub {
+  font-size: 10px;
+  fill: var(--gray-500);
+}
+
+.flowchart-sheet .flow .lbl {
+  font-size: 10px;
+  fill: var(--gray-500);
+}
+
+.flowchart-sheet .node rect {
+  fill: #fff;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+  rx: 8;
+}
+
+.flowchart-sheet .node.terminal rect {
+  fill: var(--gray-150);
+  rx: 22;
+}
+
+.flowchart-sheet .node.diamond path {
+  fill: #fff;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+}
+
+.flowchart-sheet .node.ok rect {
+  fill: rgba(120, 140, 93, 0.12);
+  stroke: var(--olive);
+}
+
+.flowchart-sheet .node.bad rect {
+  fill: rgba(176, 74, 63, 0.10);
+  stroke: var(--rust);
+}
+
+.flowchart-sheet .node {
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+
+.flowchart-sheet .node:hover {
+  transform: translateY(-1px);
+}
+
+.flowchart-sheet .node.active rect,
+.flowchart-sheet .node.active path {
+  stroke: var(--clay);
+  stroke-width: 2;
+}
+
+.flowchart-sheet .edge {
+  stroke: var(--gray-500);
+  stroke-width: 1.5;
+  fill: none;
+  marker-end: url(#arrow);
+}
+
+.flowchart-sheet .edge.no {
+  stroke: var(--rust);
+  stroke-dasharray: 4 4;
+  marker-end: url(#arrow-rust);
+}
+
+.flowchart-sheet .edge.yes {
+  stroke: var(--olive);
+  marker-end: url(#arrow-olive);
+}
+
+.flowchart-sheet aside {
+  position: sticky;
+  top: 24px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 14px;
+  background: #fff;
+  padding: 20px 20px 22px;
+}
+
+.flowchart-sheet aside .hint {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-bottom: 14px;
+}
+
+.flowchart-sheet aside h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 19px;
+  margin-bottom: 6px;
+  color: var(--slate);
+}
+
+.flowchart-sheet aside .meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-bottom: 14px;
+}
+
+.flowchart-sheet aside p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--gray-700);
+  margin-bottom: 12px;
+}
+
+.flowchart-sheet aside pre {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  background: var(--gray-150);
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  color: var(--slate);
+}
+
+.flowchart-sheet .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--gray-700);
+}
+
+.flowchart-sheet .legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flowchart-sheet .chip {
+  width: 22px;
+  height: 14px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.flowchart-sheet .chip.gate {
+  transform: rotate(45deg);
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.flowchart-sheet .chip.ok {
+  background: rgba(120, 140, 93, 0.12);
+  border-color: var(--olive);
+}
+
+.flowchart-sheet .chip.bad {
+  background: rgba(176, 74, 63, 0.10);
+  border-color: var(--rust);
+}

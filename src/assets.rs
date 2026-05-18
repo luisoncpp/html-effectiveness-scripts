@@ -93,8 +93,20 @@ fn resolve_asset(path: &str) -> Option<&'static str> {
     match path {
         "css/base.css" => Some(include_str!("../assets/css/base.css")),
         "css/prompt_box.css" => Some(include_str!("../assets/css/prompt_box.css")),
+        "css/svg_canvas.css" => Some(include_str!("../assets/css/svg_canvas.css")),
         "css/triage_board.css" => Some(include_str!("../assets/css/triage_board.css")),
+        "css/notice.css" => Some(include_str!("../assets/css/notice.css")),
+        "css/card.css" => Some(include_str!("../assets/css/card.css")),
+        "css/data_grid.css" => Some(include_str!("../assets/css/data_grid.css")),
+        "css/timeline.css" => Some(include_str!("../assets/css/timeline.css")),
+        "css/code_panel.css" => Some(include_str!("../assets/css/code_panel.css")),
+        "js/tabs.js" => Some(include_str!("../assets/js/tabs.js")),
+        "css/board_layout.css" => Some(include_str!("../assets/css/board_layout.css")),
+        "js/data_grid.js" => Some(include_str!("../assets/js/data_grid.js")),
         "js/triage_board.js" => Some(include_str!("../assets/js/triage_board.js")),
+        "css/flowchart.css" => Some(include_str!("../assets/css/flowchart.css")),
+        "js/flowchart.js" => Some(include_str!("../assets/js/flowchart.js")),
+        "css/module_map.css" => Some(include_str!("../assets/css/module_map.css")),
         "tokens/clay-slate.css" => Some(include_str!("../assets/tokens/clay-slate.css")),
         _ => None,
     }
@@ -199,7 +211,7 @@ mod tests {
         reg.stylesheets.insert("css/base.css".to_string());
         let html = reg.inline_styles();
         assert!(html.contains("<style>"));
-        assert!(html.contains("font-family: system-ui"));
+        assert!(html.contains("--ivory:"));
     }
 
     #[test]

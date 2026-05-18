@@ -1,0 +1,16 @@
+<svg class="svg-canvas" viewBox="{{ view_box }}">
+    {% for element in elements %}
+    {% if element.type == "rect" %}
+    <rect {% if element.x %}x="{{ element.x }}" {% endif %}{% if element.y %}y="{{ element.y }}" {% endif %}{% if element.width %}width="{{ element.width }}" {% endif %}{% if element.height %}height="{{ element.height }}" {% endif %}{% if element.class %}class="{{ element.class }}"{% endif %}/>
+    {% elif element.type == "circle" %}
+    <circle {% if element.cx %}cx="{{ element.cx }}" {% endif %}{% if element.cy %}cy="{{ element.cy }}" {% endif %}{% if element.r %}r="{{ element.r }}" {% endif %}{% if element.class %}class="{{ element.class }}"{% endif %}/>
+    {% elif element.type == "text" %}
+    <text {% if element.x %}x="{{ element.x }}" {% endif %}{% if element.y %}y="{{ element.y }}" {% endif %}{% if element.class %}class="{{ element.class }}"{% endif %}>{{ element.text|default("") }}</text>
+    {% elif element.type == "edge" %}
+    <line {% if element.x %}x1="{{ element.x }}" {% endif %}{% if element.y %}y1="{{ element.y }}" {% endif %}{% if element.x and element.width %}x2="{{ element.x + element.width }}" {% endif %}{% if element.y and element.height %}y2="{{ element.y + element.height }}" {% endif %}{% if element.class %}class="{{ element.class }}" {% endif %}{% if element.marker %}marker-end="url(#{{ element.marker }})"{% endif %}/>
+    {% endif %}
+    {% endfor %}
+</svg>
+{% if children %}
+<div class="svg-canvas__children">{{ children }}</div>
+{% endif %}

@@ -1,0 +1,11 @@
+<div class="notice notice--{{ variant }}">
+    {% if icon %}
+    <div class="notice__icon">
+        {% if icon == "alert-triangle" %}&#9888;{% elif icon == "info" %}&#943;{% elif icon == "check" or icon == "success" %}&#10003;{% elif icon == "x" or icon == "danger" %}&#10005;{% else %}{{ icon }}{% endif %}
+    </div>
+    {% endif %}
+    <div class="notice__content">{{ content|safe }}</div>
+    {% if children %}
+    <div class="notice__children">{{ children }}</div>
+    {% endif %}
+</div>

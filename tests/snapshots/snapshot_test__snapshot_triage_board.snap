@@ -11,30 +11,81 @@ expression: html
     <title>Acme — Cycle 14 triage</title>
     <style>
 :root {
-    --color-primary: #2563eb;
-    --color-bg: #ffffff;
-    --color-surface: #f8fafc;
-    --color-text: #1e293b;
-    --color-text-muted: #64748b;
-    --color-border: #e2e8f0;
-    --radius: 0.5rem;
-    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    --ivory: #FAF9F5;
+    --slate: #141413;
+    --clay: #D97757;
+    --clay-d: #B85C3E;
+    --oat: #E3DACC;
+    --olive: #788C5D;
+    --rust: #B04A3F;
+    --gray-50: #F0EEE6;
+    --gray-150: #F0EEE6;
+    --gray-200: #D1CFC5;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --gray-800: #3D3D3A;
+    --white: #ffffff;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
 }
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.6;
-    color: var(--color-text);
+    background: var(--ivory);
+    color: var(--gray-700);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+.layout-reading-column .page {
     max-width: 65ch;
     margin: 0 auto;
     padding: 2rem 1rem;
-    background: var(--color-bg);
 }
 
-h1, h2, h3, h4, h5, h6 {
+.layout-wide .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+}
+
+h1, h2, h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--slate);
+}
+
+h1 {
+    font-size: 2.25rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5em;
+}
+
+h2 {
+    font-size: 1.625rem;
+    letter-spacing: -0.01em;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
-    line-height: 1.25;
+}
+
+h3 {
+    font-size: 1.25rem;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+}
+
+h4, h5, h6 {
+    font-family: var(--sans);
+    font-weight: 600;
+    color: var(--slate);
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+    line-height: 1.3;
 }
 
 p {
@@ -52,10 +103,58 @@ li {
 
 strong {
     font-weight: 600;
+    color: var(--slate);
 }
 
 em {
     font-style: italic;
+}
+
+a {
+    color: var(--clay);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: var(--clay-d);
+}
+
+code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: var(--gray-150);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+pre {
+    font-family: var(--mono);
+    background: var(--slate);
+    color: #E8E6DE;
+    padding: 18px 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+blockquote {
+    border-left: 3px solid var(--clay);
+    padding-left: 1em;
+    margin: 0 0 1em;
+    color: var(--gray-500);
+}
+
+hr {
+    border: none;
+    border-top: 1.5px solid var(--gray-300);
+    margin: 2em 0;
 }
 
 :root {
@@ -82,10 +181,6 @@ html, body {
   font-family: var(--sans);
   font-size: 14px;
   line-height: 1.5;
-}
-body {
-  max-width: none;
-  padding: 0;
 }
 .wrap {
   max-width: 1180px;
@@ -347,17 +442,33 @@ button.ghost:hover { border-color: var(--gray-500); }
 }
 
 :root {
-    --color-primary: #64748b;
-    --color-bg: #f1f5f9;
-    --color-surface: #ffffff;
-    --color-text: #334155;
+    --ivory: #FAF9F5;
+    --slate: #141413;
+    --clay: #D97757;
+    --clay-d: #B85C3E;
+    --oat: #E3DACC;
+    --olive: #788C5D;
+    --rust: #B04A3F;
+    --gray-50: #F0EEE6;
+    --gray-150: #F0EEE6;
+    --gray-200: #D1CFC5;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --gray-800: #3D3D3A;
+    --white: #ffffff;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
 }
 
 </style>
 </head>
 <body class="layout-wide">
-    <main>
-        <div class="wrap">
+    
+    <div class="page">
+        <main>
+            <div class="wrap">
   <header>
     <div class="eyebrow">Acme / editor / triage</div>
     <h1>Cycle 14 triage</h1>
@@ -376,7 +487,9 @@ button.ghost:hover { border-color: var(--gray-500); }
   <div class="board" id="board"></div>
 </div>
 
-    </main>
+        </main>
+    </div>
+    
     <script>
 // ---------- data ----------
 var COLUMNS = [

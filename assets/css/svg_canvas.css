@@ -1,0 +1,28 @@
+.svg-canvas {
+    border: 1.5px solid var(--gray-300);
+    background: var(--white);
+    border-radius: 12px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5rem 0;
+    padding: 28px;
+}
+
+.svg-canvas .edge {
+    stroke: var(--gray-500);
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.svg-canvas .node-primary {
+    fill: var(--clay);
+    stroke: var(--gray-300);
+    stroke-width: 1px;
+}
+
+.svg-canvas .node-secondary {
+    fill: var(--gray-500);
+    stroke: var(--gray-300);
+    stroke-width: 1px;
+}

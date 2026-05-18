@@ -1,0 +1,60 @@
+<div class="code-panel{% if tabs %}{% for tab in tabs %}{% if tab.diff %} code-panel--diff{% endif %}{% endfor %}{% endif %}">
+    {% if tabs and tabs|length > 0 %}
+    <div class="code-panel__tabs">
+        {% for tab in tabs %}
+        <button class="code-panel__tab{% if loop.first %} code-panel__tab--active{% endif %}" data-tab="{{ loop.index0 }}">{{ tab.name }}</button>
+        {% endfor %}
+    </div>
+    <div class="code-panel__content">
+        {% for tab in tabs %}
+        <div class="code-panel__panel{% if loop.first %} code-panel__panel--active{% endif %}" data-panel="{{ loop.index0 }}">
+            <article class="file-card">
+                <div class="file-head">
+                    <div class="file-path">{{ tab.name }}</div>
+                    <div style="display:flex;align-items:center;gap:12px">
+                        {% if tab.risk %}
+                        <span class="risk-tag {{ tab.risk }}">{{ tab.risk }}</span>
+                        {% endif %}
+                        <span class="file-delta">
+                            {% if tab.added is not none %}<span class="add">+{{ tab.added }}</span>{% endif %}
+                            {% if tab.removed is not none %}<span class="del"> -{{ tab.removed }}</span>{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% if tab.diff %}
+                <div class="diff">
+                    {% set lines = tab.content|split('\n') %}
+                    {% for line in lines %}
+                    {% if line is startingwith('+') %}
+                    <div class="diff-row add">
+                        <span class="ln">{{ loop.index }}</span>
+                        <span class="mark">+</span>
+                        <span class="code">{{ line[1:] }}</span>
+                    </div>
+                    {% elif line is startingwith('-') %}
+                    <div class="diff-row del">
+                        <span class="ln">{{ loop.index }}</span>
+                        <span class="mark">-</span>
+                        <span class="code">{{ line[1:] }}</span>
+                    </div>
+                    {% else %}
+                    <div class="diff-row ctx">
+                        <span class="ln">{{ loop.index }}</span>
+                        <span class="mark"> </span>
+                        <span class="code">{{ line }}</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <pre><code class="language-{{ tab.language }}">{{ tab.content }}</code></pre>
+                {% endif %}
+            </article>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if children %}
+    <div class="code-panel__children">{{ children }}</div>
+    {% endif %}
+</div>

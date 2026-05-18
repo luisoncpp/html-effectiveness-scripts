@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Primitives Demo</title>
+    <style>
+:root {
+    --ivory: #FAF9F5;
+    --slate: #141413;
+    --clay: #D97757;
+    --clay-d: #B85C3E;
+    --oat: #E3DACC;
+    --olive: #788C5D;
+    --rust: #B04A3F;
+    --gray-50: #F0EEE6;
+    --gray-150: #F0EEE6;
+    --gray-200: #D1CFC5;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --gray-800: #3D3D3A;
+    --white: #ffffff;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--ivory);
+    color: var(--gray-700);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+.layout-reading-column .page {
+    max-width: 65ch;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.layout-wide .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+}
+
+h1, h2, h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--slate);
+}
+
+h1 {
+    font-size: 2.25rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5em;
+}
+
+h2 {
+    font-size: 1.625rem;
+    letter-spacing: -0.01em;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+h3 {
+    font-size: 1.25rem;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+}
+
+h4, h5, h6 {
+    font-family: var(--sans);
+    font-weight: 600;
+    color: var(--slate);
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+    line-height: 1.3;
+}
+
+p {
+    margin: 0 0 1em;
+}
+
+ul, ol {
+    margin: 0 0 1em;
+    padding-left: 1.5em;
+}
+
+li {
+    margin-bottom: 0.25em;
+}
+
+strong {
+    font-weight: 600;
+    color: var(--slate);
+}
+
+em {
+    font-style: italic;
+}
+
+a {
+    color: var(--clay);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: var(--clay-d);
+}
+
+code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: var(--gray-150);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+pre {
+    font-family: var(--mono);
+    background: var(--slate);
+    color: #E8E6DE;
+    padding: 18px 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+blockquote {
+    border-left: 3px solid var(--clay);
+    padding-left: 1em;
+    margin: 0 0 1em;
+    color: var(--gray-500);
+}
+
+hr {
+    border: none;
+    border-top: 1.5px solid var(--gray-300);
+    margin: 2em 0;
+}
+
+.board-layout {
+    margin: 1.5rem 0;
+}
+
+.board-layout--kanban {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+}
+
+.board-layout--grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.board-layout--slides {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.board-column {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    min-width: 200px;
+    flex: 1;
+}
+
+.board-layout--slides .board-column {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+}
+
+.board-column__title {
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.board-item {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+}
+
+.board-item:last-child {
+    margin-bottom: 0;
+}
+
+.board-layout__children {
+    margin-top: 1rem;
+}
+
+.card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+}
+
+.card--elevation-1 {
+    box-shadow: var(--shadow);
+}
+
+.card--elevation-2 {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.card--elevation-3 {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.card__title {
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
+    font-size: 1.125rem;
+}
+
+.card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.card__tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: calc(var(--radius) / 2);
+    padding: 0.25rem 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.card__content {
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+.card__children {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.code-panel {
+    /* preserved for test compatibility */
+}
+
+.code-panel__tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem 0;
+    background: var(--ivory);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.code-panel__tab {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    color: var(--gray-500);
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.code-panel__tab:hover {
+    background: var(--white);
+    color: var(--slate);
+}
+
+.code-panel__tab--active {
+    background: var(--white);
+    color: var(--clay);
+    box-shadow: inset 0 2px 0 0 var(--clay);
+}
+
+.code-panel__content {
+    /* preserved for test compatibility */
+}
+
+.code-panel__panel {
+    display: none;
+}
+
+.code-panel__panel--active {
+    display: block;
+}
+
+.file-card {
+    border: 1.5px solid var(--gray-300);
+    border-radius: 12px;
+    background: #fff;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.file-head {
+    padding: 16px 20px;
+    border-bottom: 1.5px solid var(--gray-150);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.file-path {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--slate);
+}
+
+.file-delta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+.file-delta .add {
+    color: var(--olive);
+}
+
+.file-delta .del {
+    color: var(--rust);
+}
+
+.risk-tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.risk-tag.safe {
+    background: rgba(120, 140, 93, 0.15);
+    color: var(--olive);
+}
+
+.risk-tag.medium {
+    background: var(--oat);
+    color: #7A6A4F;
+}
+
+.risk-tag.attention {
+    background: rgba(217, 119, 87, 0.15);
+    color: var(--clay);
+}
+
+.diff {
+    background: var(--slate);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+}
+
+.diff-row {
+    display: grid;
+    grid-template-columns: 48px 18px 1fr;
+    align-items: baseline;
+    padding: 0 14px 0 0;
+    white-space: pre;
+}
+
+.diff-row .ln {
+    text-align: right;
+    padding-right: 14px;
+    color: var(--gray-500);
+    user-select: none;
+}
+
+.diff-row .mark {
+    text-align: center;
+    color: var(--gray-500);
+}
+
+.diff-row .code {
+    color: #E8E6DC;
+}
+
+.diff-row.ctx .code {
+    color: #B8B6AC;
+}
+
+.diff-row.add {
+    background: rgba(120, 140, 93, 0.15);
+}
+
+.diff-row.add .mark {
+    color: var(--olive);
+}
+
+.diff-row.del {
+    background: rgba(176, 74, 63, 0.15);
+}
+
+.diff-row.del .mark {
+    color: var(--rust);
+}
+
+.data-grid {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--white);
+    border: 1.5px solid var(--gray-300);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    font-size: 0.9375rem;
+}
+
+.data-grid thead {
+    background: var(--gray-100);
+    border-bottom: 1.5px solid var(--gray-300);
+}
+
+.data-grid th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.data-grid td {
+    padding: 13px 16px;
+    color: var(--slate);
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.data-grid tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-grid tbody tr:hover {
+    background: var(--ivory);
+}
+
+.data-grid__children {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-300);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.badge--high {
+    background: #F5E2D8;
+    color: var(--rust);
+}
+
+.badge--med,
+.badge--medium {
+    background: var(--oat);
+    color: #7A6A4F;
+}
+
+.badge--low {
+    background: #E8EDE0;
+    color: #5C6F44;
+}
+
+.flowchart-sheet {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.flowchart-sheet header {
+  margin-bottom: 40px;
+}
+
+.flowchart-sheet .eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+}
+
+.flowchart-sheet h1 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 34px;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: var(--slate);
+}
+
+.flowchart-sheet .lead {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--gray-700);
+  max-width: 640px;
+}
+
+.flowchart-sheet .lead code {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.flowchart-sheet .layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 920px) {
+  .flowchart-sheet .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.flowchart-sheet .canvas {
+  border: 1.5px solid var(--gray-300);
+  border-radius: 14px;
+  background: #fff;
+  padding: 28px;
+  overflow-x: auto;
+}
+
+.flowchart-sheet svg.flow {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.flowchart-sheet .flow text {
+  font-family: var(--mono);
+  font-size: 12px;
+  fill: var(--slate);
+  pointer-events: none;
+}
+
+.flowchart-sheet .flow .sub {
+  font-size: 10px;
+  fill: var(--gray-500);
+}
+
+.flowchart-sheet .flow .lbl {
+  font-size: 10px;
+  fill: var(--gray-500);
+}
+
+.flowchart-sheet .node rect {
+  fill: #fff;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+  rx: 8;
+}
+
+.flowchart-sheet .node.terminal rect {
+  fill: var(--gray-150);
+  rx: 22;
+}
+
+.flowchart-sheet .node.diamond path {
+  fill: #fff;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+}
+
+.flowchart-sheet .node.ok rect {
+  fill: rgba(120, 140, 93, 0.12);
+  stroke: var(--olive);
+}
+
+.flowchart-sheet .node.bad rect {
+  fill: rgba(176, 74, 63, 0.10);
+  stroke: var(--rust);
+}
+
+.flowchart-sheet .node {
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+
+.flowchart-sheet .node:hover {
+  transform: translateY(-1px);
+}
+
+.flowchart-sheet .node.active rect,
+.flowchart-sheet .node.active path {
+  stroke: var(--clay);
+  stroke-width: 2;
+}
+
+.flowchart-sheet .edge {
+  stroke: var(--gray-500);
+  stroke-width: 1.5;
+  fill: none;
+  marker-end: url(#arrow);
+}
+
+.flowchart-sheet .edge.no {
+  stroke: var(--rust);
+  stroke-dasharray: 4 4;
+  marker-end: url(#arrow-rust);
+}
+
+.flowchart-sheet .edge.yes {
+  stroke: var(--olive);
+  marker-end: url(#arrow-olive);
+}
+
+.flowchart-sheet aside {
+  position: sticky;
+  top: 24px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 14px;
+  background: #fff;
+  padding: 20px 20px 22px;
+}
+
+.flowchart-sheet aside .hint {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-bottom: 14px;
+}
+
+.flowchart-sheet aside h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 19px;
+  margin-bottom: 6px;
+  color: var(--slate);
+}
+
+.flowchart-sheet aside .meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-bottom: 14px;
+}
+
+.flowchart-sheet aside p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--gray-700);
+  margin-bottom: 12px;
+}
+
+.flowchart-sheet aside pre {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  background: var(--gray-150);
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  color: var(--slate);
+}
+
+.flowchart-sheet .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--gray-700);
+}
+
+.flowchart-sheet .legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flowchart-sheet .chip {
+  width: 22px;
+  height: 14px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.flowchart-sheet .chip.gate {
+  transform: rotate(45deg);
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.flowchart-sheet .chip.ok {
+  background: rgba(120, 140, 93, 0.12);
+  border-color: var(--olive);
+}
+
+.flowchart-sheet .chip.bad {
+  background: rgba(176, 74, 63, 0.10);
+  border-color: var(--rust);
+}
+
+.module-map {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.module-map h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 26px;
+  color: var(--slate);
+  margin-bottom: 14px;
+}
+
+.module-map .canvas {
+  border: 1.5px solid var(--gray-300);
+  border-radius: 12px;
+  background: #fff;
+  padding: 28px;
+  overflow-x: auto;
+}
+
+.module-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.module-map text {
+  font-family: var(--mono);
+  font-size: 12px;
+  fill: var(--slate);
+}
+
+.module-map .node rect {
+  fill: #fff;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+  rx: 8;
+}
+
+.module-map .node.highlight rect {
+  fill: var(--gray-150);
+  stroke: var(--slate);
+  stroke-width: 2;
+}
+
+.module-map .edge {
+  stroke: var(--gray-500);
+  stroke-width: 1.5;
+  fill: none;
+  marker-end: url(#arrow);
+}
+
+.notice {
+    background: var(--white);
+    border: 1.5px solid var(--gray-300);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 18px 0;
+    border-left: 4px solid var(--gray-500);
+}
+
+.notice__icon {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 14px;
+    color: var(--gray-500);
+}
+
+.notice__content {
+    color: var(--slate);
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.notice__content p {
+    margin: 0 0 0.5em;
+}
+
+.notice__content p:last-child {
+    margin-bottom: 0;
+}
+
+.notice__children {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--gray-300);
+}
+
+.notice--info {
+    border-left-color: var(--clay);
+}
+
+.notice--info .notice__icon {
+    color: var(--clay);
+}
+
+.notice--success {
+    border-left-color: var(--olive);
+}
+
+.notice--success .notice__icon {
+    color: var(--olive);
+}
+
+.notice--danger {
+    border-left-color: var(--rust);
+}
+
+.notice--danger .notice__icon {
+    color: var(--rust);
+}
+
+.notice--warning {
+    border-left-color: var(--clay);
+}
+
+.notice--warning .notice__icon {
+    color: var(--clay);
+}
+
+.notice--sticky-nav {
+    border-left-color: var(--gray-500);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.notice--sticky-nav .notice__icon {
+    color: var(--gray-500);
+}
+
+.svg-canvas {
+    border: 1.5px solid var(--gray-300);
+    background: var(--white);
+    border-radius: 12px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5rem 0;
+    padding: 28px;
+}
+
+.svg-canvas .edge {
+    stroke: var(--gray-500);
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.svg-canvas .node-primary {
+    fill: var(--clay);
+    stroke: var(--gray-300);
+    stroke-width: 1px;
+}
+
+.svg-canvas .node-secondary {
+    fill: var(--gray-500);
+    stroke: var(--gray-300);
+    stroke-width: 1px;
+}
+
+.timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline--vertical {
+    /* preserved for test compatibility */
+}
+
+.milestones {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.milestone {
+    display: grid;
+    grid-template-columns: 120px 28px 1fr;
+    gap: 0 18px;
+    position: relative;
+}
+
+.milestone .when {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gray-500);
+    padding-top: 4px;
+}
+
+.milestone .dot-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.milestone .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 3px solid var(--clay);
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.milestone .dot.done {
+    background: var(--olive);
+    border-color: var(--olive);
+}
+
+.milestone .line {
+    width: 2px;
+    flex: 1;
+    background: var(--gray-300);
+    margin: 4px 0;
+}
+
+.milestone:last-child .line {
+    display: none;
+}
+
+.milestone .body {
+    padding-bottom: 36px;
+}
+
+.milestone .body h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 19px;
+    color: var(--slate);
+    margin-bottom: 4px;
+}
+
+.milestone .body p {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-bottom: 10px;
+    max-width: 620px;
+}
+
+.milestone .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.milestone .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: var(--gray-150);
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    padding: 3px 8px;
+    color: var(--gray-700);
+}
+
+:root {
+  --ivory: #FAF9F5;
+  --slate: #141413;
+  --clay: #D97757;
+  --clay-d: #B85C3E;
+  --oat: #E3DACC;
+  --olive: #788C5D;
+  --gray-50: #F0EEE6;
+  --gray-200: #D1CFC5;
+  --gray-500: #87867F;
+  --gray-800: #3D3D3A;
+  --white: #ffffff;
+  --serif: ui-serif, Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--slate);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 48px 32px 64px;
+}
+
+/* ---------- header ---------- */
+header { margin-bottom: 22px; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+}
+h1 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 30px;
+  letter-spacing: -0.01em;
+  margin: 6px 0 4px;
+}
+.sub {
+  color: var(--gray-500);
+  max-width: 620px;
+  margin: 0;
+}
+.hintline {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-top: 10px;
+}
+.hintline::before {
+  content: ">";
+  color: var(--clay);
+  margin-right: 6px;
+}
+
+/* ---------- toolbar ---------- */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--ivory);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0 12px;
+  margin-bottom: 14px;
+  border-bottom: 1.5px solid var(--gray-200);
+}
+.summary {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--gray-800);
+  letter-spacing: 0.01em;
+}
+.summary b { color: var(--slate); font-weight: 600; }
+.summary .dot { color: var(--gray-200); margin: 0 4px; }
+.spacer { flex: 1; }
+.filter-active {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--clay-d);
+  background: #F5E6DE;
+  border: 1.5px solid #E8C9BA;
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+  display: none;
+}
+.filter-active.on { display: inline-block; }
+.filter-active:hover { border-color: var(--clay); }
+button.primary {
+  background: var(--slate);
+  color: var(--ivory);
+  border: 1.5px solid var(--slate);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 9px 16px;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+button.primary:hover { background: var(--gray-800); }
+button.primary.copied { background: var(--olive); border-color: var(--olive); }
+button.ghost {
+  background: transparent;
+  color: var(--gray-800);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+button.ghost:hover { border-color: var(--gray-500); }
+
+/* ---------- board ---------- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.col {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+.col[data-col="now"]   { border-top: 3px solid var(--clay); }
+.col[data-col="next"]  { border-top: 3px solid var(--olive); }
+.col[data-col="later"] { border-top: 3px solid var(--gray-500); }
+.col[data-col="cut"]   { border-top: 3px solid var(--gray-200); }
+.col.dragover {
+  outline: 2px dashed var(--clay);
+  outline-offset: -6px;
+  background: #FBF6F2;
+}
+.col-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--white);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px 14px 10px;
+  border-bottom: 1.5px solid var(--gray-50);
+}
+.col-head h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.col-head .count {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  background: var(--gray-50);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 999px;
+  padding: 1px 8px;
+  min-width: 26px;
+  text-align: center;
+}
+.col-body {
+  padding: 10px 10px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 60px;
+}
+.col-foot {
+  border-top: 1.5px solid var(--gray-50);
+  padding: 8px 14px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  display: flex;
+  justify-content: space-between;
+}
+.col-foot b { color: var(--gray-800); font-weight: 600; }
+
+/* ---------- ticket card ---------- */
+.ticket {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 10px 11px 9px;
+  cursor: grab;
+  user-select: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+.ticket:hover { border-color: var(--gray-500); box-shadow: 0 1px 3px rgba(20,20,19,0.06); }
+.ticket:active { cursor: grabbing; }
+.ticket.dragging { opacity: .4; }
+.ticket.dim { opacity: .25; }
+.ticket-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.tid {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  letter-spacing: 0.01em;
+}
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  padding: 1px 7px 2px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.tag:hover { filter: brightness(0.96); }
+.tag-bug   { background: #F5E2D8; color: var(--clay-d); border-color: #E8C9BA; }
+.tag-feat  { background: #E8EDE0; color: #5C6F44; border-color: #CFDAC0; }
+.tag-chore { background: var(--gray-50); color: var(--gray-800); border-color: var(--gray-200); }
+.tag-debt  { background: var(--gray-50); color: var(--gray-800); border-color: var(--gray-200); }
+.est {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gray-500);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ttitle {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--slate);
+  margin-bottom: 7px;
+}
+.ticket-bot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.owner {
+  font-family: var(--mono);
+  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--oat);
+  color: var(--gray-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+}
+.owner.o2 { background: #DCE4D2; }
+.owner.o3 { background: #ECD9CE; }
+.owner.o4 { background: var(--gray-50); }
+
+@media (max-width: 920px) {
+  .board { grid-template-columns: repeat(2, 1fr); }
+}
+
+:root {
+    --ivory: #FAF9F5;
+    --slate: #141413;
+    --clay: #D97757;
+    --clay-d: #B85C3E;
+    --oat: #E3DACC;
+    --olive: #788C5D;
+    --rust: #B04A3F;
+    --gray-50: #F0EEE6;
+    --gray-150: #F0EEE6;
+    --gray-200: #D1CFC5;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --gray-800: #3D3D3A;
+    --white: #ffffff;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+</style>
+</head>
+<body class="layout-wide">
+    
+    <div class="page">
+        <main>
+            <h1>UI Primitives Showcase</h1>
+<p>This document demonstrates every available YAML component primitive.</p>
+<h2>Notice</h2>
+<div class="notice notice--warning">
+    
+    <div class="notice__icon">
+        &#9888;
+    </div>
+    
+    <div class="notice__content"><strong>Breaking Change:</strong> The parser now expects multiple blocks.
+</div>
+    
+</div>
+<h2>Card</h2>
+<div class="card card--elevation-2">
+    <div class="card__title">Feature Card</div>
+    
+    <div class="card__tags">
+        <span class="card__tag">rust</span><span class="card__tag">urgent</span>
+    </div>
+    
+    <div class="card__content">This card demonstrates tags, elevation, and content.
+</div>
+    
+    <div class="card__children"><div class="notice notice--info">
+    
+    <div class="notice__content">Nested notice inside a card.</div>
+    
+</div></div>
+    
+</div>
+<h2>Data Grid</h2>
+<table class="data-grid">
+    <thead>
+        <tr>
+            <th>Feature</th><th>Status</th><th>Risk</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr>
+            <td>AST Traversal</td><td>Shipped</td><td>Low</td>
+        </tr>
+        
+        <tr>
+            <td>Drag & Drop</td><td>WIP</td><td>High</td>
+        </tr>
+        
+        <tr>
+            <td>Syntax Highlighting</td><td>Planned</td><td>Medium</td>
+        </tr>
+        
+    </tbody>
+</table>
+<h2>Timeline</h2>
+<ol class="timeline timeline--vertical">
+    <div class="milestones">
+        
+        <div class="milestone">
+            <div class="when">Week 1 · Mon–Tue</div>
+            <div class="dot-col">
+                <span class="dot"></span>
+                <span class="line"></span>
+            </div>
+            <div class="body">
+                <h3>Schema & API contract</h3>
+                
+                <p>New comments and comment_reads tables, migrations, and the tRPC router stubs.</p>
+                
+                
+                <div class="tags">
+                    
+                    <span class="tag">packages/db</span>
+                    
+                    <span class="tag">packages/api</span>
+                    
+                    <span class="tag">migration 0042</span>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="milestone">
+            <div class="when">Week 2 · Wed–Fri</div>
+            <div class="dot-col">
+                <span class="dot"></span>
+                <span class="line"></span>
+            </div>
+            <div class="body">
+                <h3>UI polish & edge cases</h3>
+                
+                <p>Thread nesting, optimistic updates, and empty-state screens.</p>
+                
+                
+                <div class="tags">
+                    
+                    <span class="tag">packages/ui</span>
+                    
+                    <span class="tag">ux</span>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="milestone">
+            <div class="when">Week 3 · Mon</div>
+            <div class="dot-col">
+                <span class="dot"></span>
+                
+            </div>
+            <div class="body">
+                <h3>Ship to beta</h3>
+                
+                <p>Feature flag enabled for 10% of users.</p>
+                
+                
+                <div class="tags">
+                    
+                    <span class="tag">release</span>
+                    
+                    <span class="tag">beta</span>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</ol>
+<h2>Board Layout</h2>
+<div class="board-layout board-layout--kanban">
+    
+    <div class="board-column">
+        <div class="board-column__title">To Do</div>
+        
+        <div class="board-item">Implement SVG canvas</div>
+        
+        <div class="board-item">Write integration tests</div>
+        
+    </div>
+    
+    <div class="board-column">
+        <div class="board-column__title">In Progress</div>
+        
+        <div class="board-item">Refactor parser</div>
+        
+    </div>
+    
+    <div class="board-column">
+        <div class="board-column__title">Done</div>
+        
+        <div class="board-item">Setup CI</div>
+        
+    </div>
+    
+</div>
+<h2>Code Panel</h2>
+<div class="code-panel code-panel--diff">
+    
+    <div class="code-panel__tabs">
+        
+        <button class="code-panel__tab code-panel__tab--active" data-tab="0">src/compiler.rs</button>
+        
+        <button class="code-panel__tab" data-tab="1">Cargo.toml</button>
+        
+    </div>
+    <div class="code-panel__content">
+        
+        <div class="code-panel__panel code-panel__panel--active" data-panel="0">
+            <article class="file-card">
+                <div class="file-head">
+                    <div class="file-path">src/compiler.rs</div>
+                    <div style="display:flex;align-items:center;gap:12px">
+                        
+                        <span class="risk-tag attention">attention</span>
+                        
+                        <span class="file-delta">
+                            <span class="add">+58</span>
+                            <span class="del"> -0</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="diff">
+                    
+                    
+                    
+                    <div class="diff-row del">
+                        <span class="ln">1</span>
+                        <span class="mark">-</span>
+                        <span class="code"> let tree = parse_single();</span>
+                    </div>
+                    
+                    
+                    
+                    <div class="diff-row add">
+                        <span class="ln">2</span>
+                        <span class="mark">+</span>
+                        <span class="code"> let ast = parse_blocks();</span>
+                    </div>
+                    
+                    
+                    
+                    <div class="diff-row ctx">
+                        <span class="ln">3</span>
+                        <span class="mark"> </span>
+                        <span class="code"></span>
+                    </div>
+                    
+                    
+                </div>
+                
+            </article>
+        </div>
+        
+        <div class="code-panel__panel" data-panel="1">
+            <article class="file-card">
+                <div class="file-head">
+                    <div class="file-path">Cargo.toml</div>
+                    <div style="display:flex;align-items:center;gap:12px">
+                        
+                        <span class="risk-tag safe">safe</span>
+                        
+                        <span class="file-delta">
+                            <span class="add">+2</span>
+                            <span class="del"> -1</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <pre><code class="language-toml">[dependencies]
+pulldown-cmark = "0.9"
+</code></pre>
+                
+            </article>
+        </div>
+        
+    </div>
+    
+    
+</div>
+<h2>SVG Canvas</h2>
+<svg class="svg-canvas" viewBox="0 0 400 200">
+    
+    
+    <rect x="10" y="10" width="100" height="60" class="node-primary"/>
+    
+    
+    
+    <circle cx="200" cy="100" r="40" class="node-secondary"/>
+    
+    
+    
+    <text x="10" y="100" >Hello SVG</text>
+    
+    
+</svg>
+<h2>Flowchart</h2>
+<div class="sheet flowchart-sheet">
+  <header>
+    <div class="eyebrow">Illustrations &amp; Diagrams · Flowchart</div>
+    <h1>What happens when you git push</h1>
+    
+    <p class="lead">The deploy pipeline for acme/web.</p>
+    
+  </header>
+
+  <div class="layout">
+    <div>
+      <div class="canvas">
+        <svg class="flow" viewBox="0 0 620 400">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#87867F"/>
+            </marker>
+            <marker id="arrow-rust" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#B04A3F"/>
+            </marker>
+            <marker id="arrow-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#788C5D"/>
+            </marker>
+          </defs>
+
+          <!-- edges -->
+          
+          <path class="edge"
+                d="M310,56 L310,92"
+                marker-end="url(#arrow)"/>
+          
+          
+          <path class="edge"
+                d="M310,140 L310,176"
+                marker-end="url(#arrow)"/>
+          
+          
+          <path class="edge"
+                d="M310,224 L310,262"
+                marker-end="url(#arrow)"/>
+          
+          
+          <path class="edge yes"
+                d="M310,310 L310,350"
+                marker-end="url(#arrow-olive)"/>
+          
+          <text class="lbl" x="0" y="0">pass</text>
+          
+          
+
+          <!-- nodes -->
+          
+          <g class="node "
+             data-idx="0">
+            
+            <rect x="230" y="12" width="160" height="44"/>
+            
+            <text x="310" y="38" text-anchor="middle">git push main</text>
+            
+          </g>
+          
+          <g class="node "
+             data-idx="1">
+            
+            <rect x="210" y="92" width="200" height="48"/>
+            
+            <text x="310" y="120" text-anchor="middle">CI · lint + typecheck</text>
+            
+            <text class="sub" x="310" y="136" text-anchor="middle">~2 min · ci.yml</text>
+            
+          </g>
+          
+          <g class="node "
+             data-idx="2">
+            
+            <rect x="210" y="176" width="200" height="48"/>
+            
+            <text x="310" y="204" text-anchor="middle">Unit + integration tests</text>
+            
+            <text class="sub" x="310" y="220" text-anchor="middle">~6 min · 3 shards</text>
+            
+          </g>
+          
+          <g class="node "
+             data-idx="3">
+            
+            <rect x="268" y="262" width="84" height="48"/>
+            
+            <text x="310" y="290" text-anchor="middle">pass?</text>
+            
+          </g>
+          
+          <g class="node "
+             data-idx="4">
+            
+            <rect x="230" y="350" width="160" height="44"/>
+            
+            <text x="310" y="376" text-anchor="middle">Deploy complete</text>
+            
+          </g>
+          
+        </svg>
+      </div>
+
+      <div class="legend">
+        <span><i class="chip"></i> process step</span>
+        <span><i class="chip gate"></i> decision</span>
+        <span><i class="chip ok"></i> terminal success</span>
+        <span><i class="chip bad"></i> failure path</span>
+      </div>
+    </div>
+
+    <aside id="panel">
+      <div class="hint">Click a step in the chart →</div>
+      
+      <h3 id="p-title">git push main</h3>
+      <div class="meta" id="p-meta">trigger · 0s</div>
+      <p id="p-body">A push or merge to main fires the deploy workflow.</p>
+      
+      <pre id="p-code">on:
+  push:
+    branches: [main]</pre>
+      
+      
+    </aside>
+  </div>
+
+  
+  <template id="detail-0">
+    <h3>git push main</h3>
+    <div class="meta">trigger · 0s</div>
+    <p>A push or merge to main fires the deploy workflow.</p>
+    
+    <pre>on:
+  push:
+    branches: [main]</pre>
+    
+  </template>
+  
+  <template id="detail-1">
+    <h3>CI · lint + typecheck</h3>
+    <div class="meta">github actions · ~2 min</div>
+    <p>Runs ESLint and tsc --noEmit in parallel.</p>
+    
+    <pre>jobs:
+  lint:
+    run: pnpm lint && pnpm typecheck</pre>
+    
+  </template>
+  
+  <template id="detail-2">
+    <h3>Unit + integration tests</h3>
+    <div class="meta">github actions · ~6 min</div>
+    <p>Vitest unit suite plus the API integration tests.</p>
+    
+    <pre>run: pnpm test</pre>
+    
+  </template>
+  
+  <template id="detail-3">
+    <h3>Tests pass?</h3>
+    <div class="meta">decision</div>
+    <p>Any shard failing short-circuits here.</p>
+    
+    <pre>needs: [test]
+if: success()</pre>
+    
+  </template>
+  
+  <template id="detail-4">
+    <h3>Deploy complete</h3>
+    <div class="meta">terminal · ~30 min total</div>
+    <p>Commit status flips to success.</p>
+    
+    <pre>✓ web@a1b9e3f live on prod</pre>
+    
+  </template>
+  
+</div>
+
+<script>
+(function() {
+  const root = document.querySelector(".flowchart-sheet");
+  if (!root) return;
+  const nodes = root.querySelectorAll(".node");
+  const panel = root.querySelector("aside");
+  if (!panel) return;
+  const hint = panel.querySelector(".hint");
+
+  function activate(idx) {
+    nodes.forEach(function(x) { x.classList.remove("active"); });
+    const node = root.querySelector('.node[data-idx="' + idx + '"]');
+    if (node) node.classList.add("active");
+    const tmpl = document.getElementById("detail-" + idx);
+    if (!tmpl) return;
+    const frag = tmpl.content.cloneNode(true);
+    panel.innerHTML = "";
+    panel.appendChild(frag);
+  }
+
+  nodes.forEach(function(n) {
+    n.addEventListener("click", function() {
+      const idx = n.dataset.idx;
+      if (idx !== undefined) activate(idx);
+    });
+  });
+
+  if (nodes.length > 0 && nodes[0].dataset.idx !== undefined) {
+    activate(nodes[0].dataset.idx);
+  }
+})();
+</script>
+<h2>Module Map</h2>
+<div class="module-map">
+  <h2>Module dependencies</h2>
+  <div class="canvas">
+    <svg viewBox="0 0 600 300">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#87867F"/>
+        </marker>
+      </defs>
+
+      <!-- edges -->
+      
+      <path class="edge" d="M170,75 L250,75" marker-end="url(#arrow)"/>
+      
+      
+      <path class="edge" d="M370,75 L450,75" marker-end="url(#arrow)"/>
+      
+      
+      <path class="edge" d="M310,180 L310,100" marker-end="url(#arrow)"/>
+      
+      
+
+      <!-- nodes -->
+      
+      <g class="node highlight">
+        <rect x="50" y="50" width="120" height="50" rx="8"/>
+        <text x="110" y="79" text-anchor="middle">parser.rs</text>
+      </g>
+      
+      <g class="node">
+        <rect x="250" y="50" width="120" height="50" rx="8"/>
+        <text x="310" y="79" text-anchor="middle">renderer.rs</text>
+      </g>
+      
+      <g class="node">
+        <rect x="450" y="50" width="120" height="50" rx="8"/>
+        <text x="510" y="79" text-anchor="middle">compiler.rs</text>
+      </g>
+      
+      <g class="node">
+        <rect x="250" y="180" width="120" height="50" rx="8"/>
+        <text x="310" y="209" text-anchor="middle">assets.rs</text>
+      </g>
+      
+    </svg>
+  </div>
+</div>
+<h2>Triage Board (Legacy)</h2>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Demo / sprint / triage</div>
+    <h1>Cycle 15 triage</h1>
+    <p class="sub">Twenty-four open tickets, pre-sorted into a best guess.</p>
+    <div class="hintline">drag tickets between columns</div>
+  </header>
+
+  <div class="toolbar">
+    <div class="summary" id="summary"></div>
+    <div class="spacer"></div>
+    <button class="filter-active" id="filterBadge"></button>
+    <button class="ghost" id="resetBtn">Reset</button>
+    <button class="primary" id="copyBtn">Copy as markdown</button>
+  </div>
+
+  <div class="board" id="board"></div>
+</div>
+<hr />
+<p>That's all primitives in a single document.</p>
+
+        </main>
+    </div>
+    
+    <script>
+(function () {
+  'use strict';
+
+  function initFlowchart (root) {
+    const nodes = root.querySelectorAll('.node');
+    const panel = root.querySelector('aside');
+    if (!panel) return;
+
+    const titleEl = panel.querySelector('#p-title');
+    const metaEl = panel.querySelector('#p-meta');
+    const bodyEl = panel.querySelector('#p-body');
+    const codeEl = panel.querySelector('#p-code');
+    const hintEl = panel.querySelector('.hint');
+
+    const DETAIL = window.DETAIL || {};
+
+    function activate (node) {
+      nodes.forEach(function (x) { x.classList.remove('active'); });
+      node.classList.add('active');
+      const key = node.dataset.key;
+      if (!key) return;
+      const d = DETAIL[key];
+      if (!d) return;
+      if (hintEl) hintEl.style.display = 'none';
+      if (titleEl) titleEl.innerHTML = d.title;
+      if (metaEl) metaEl.textContent = d.meta;
+      if (bodyEl) bodyEl.innerHTML = d.body;
+      if (codeEl) {
+        if (d.code) {
+          codeEl.style.display = 'block';
+          codeEl.textContent = d.code;
+        } else {
+          codeEl.style.display = 'none';
+        }
+      }
+    }
+
+    nodes.forEach(function (n) {
+      n.addEventListener('click', function () {
+        activate(n);
+      });
+    });
+
+    // Activate first node by default if present
+    if (nodes.length > 0) {
+      activate(nodes[0]);
+    }
+  }
+
+  document.querySelectorAll('.flowchart-sheet').forEach(initFlowchart);
+})();
+
+(function () {
+  document.querySelectorAll('.code-panel').forEach(function (panel) {
+    panel.querySelectorAll('.code-panel__tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = btn.dataset.tab;
+        panel.querySelectorAll('.code-panel__tab').forEach(function (b) { b.classList.remove('code-panel__tab--active'); });
+        panel.querySelectorAll('.code-panel__panel').forEach(function (p) { p.classList.remove('code-panel__panel--active'); });
+        btn.classList.add('code-panel__tab--active');
+        var p = panel.querySelector('.code-panel__panel[data-panel="' + idx + '"]');
+        if (p) p.classList.add('code-panel__panel--active');
+      });
+    });
+  });
+})();
+
+// ---------- data ----------
+var COLUMNS = [
+  { key: 'now',   label: 'Now',   rationale: 'Blocking the v2.4 release or actively losing user data.' },
+  { key: 'next',  label: 'Next',  rationale: 'High-leverage and well-scoped — start the moment Now clears.' },
+  { key: 'later', label: 'Later', rationale: 'Real, but can ride to a future cycle without anyone noticing.' },
+  { key: 'cut',   label: 'Cut',   rationale: 'Not this quarter — close, dedupe, or push back to the requester.' }
+];
+
+var EST_PTS = { S: 1, M: 2, L: 3 };
+
+// tag, est, owner, col
+var INITIAL = [
+  { id: 'BIR-241', title: 'Fix sync conflict toast firing twice on reconnect', tag: 'bug',   est: 'M', owner: 'AK', col: 'now' },
+  { id: 'BIR-238', title: 'Comments lost when editing offline then reloading', tag: 'bug',   est: 'L', owner: 'JM', col: 'now' },
+  { id: 'BIR-252', title: 'Billing webhook 500s on annual → monthly downgrade', tag: 'bug',   est: 'M', owner: 'RS', col: 'now' },
+  { id: 'BIR-219', title: 'Migrate workspace permissions to new ACL table',    tag: 'debt',  est: 'L', owner: 'AK', col: 'now' },
+  { id: 'BIR-260', title: 'SSO login loop on Safari 17 with strict cookies',   tag: 'bug',   est: 'S', owner: 'TN', col: 'now' },
+
+  { id: 'BIR-244', title: 'Inline @-mention picker in doc comments',           tag: 'feat',  est: 'M', owner: 'JM', col: 'next' },
+  { id: 'BIR-231', title: 'Bulk-archive completed projects from the sidebar',  tag: 'feat',  est: 'S', owner: 'EL', col: 'next' },
+  { id: 'BIR-247', title: 'Activity feed: collapse repeated edit events',      tag: 'feat',  est: 'M', owner: 'TN', col: 'next' },
+  { id: 'BIR-228', title: 'Notification preferences per project',              tag: 'feat',  est: 'L', owner: 'EL', col: 'next' },
+  { id: 'BIR-255', title: 'Keyboard shortcut cheat-sheet overlay (⌘/)',        tag: 'feat',  est: 'S', owner: 'RS', col: 'next' },
+  { id: 'BIR-236', title: 'Empty-state illustrations for new workspaces',      tag: 'chore', est: 'S', owner: 'EL', col: 'next' },
+  { id: 'BIR-249', title: 'Audit log export to CSV for admins',                tag: 'feat',  est: 'M', owner: 'AK', col: 'next' },
+
+  { id: 'BIR-213', title: 'Dark mode pass on settings + billing pages',        tag: 'chore', est: 'M', owner: 'EL', col: 'later' },
+  { id: 'BIR-258', title: 'Slack integration: post on milestone close',        tag: 'feat',  est: 'M', owner: 'RS', col: 'later' },
+  { id: 'BIR-221', title: 'Replace moment.js with date-fns across web',        tag: 'debt',  est: 'L', owner: 'TN', col: 'later' },
+  { id: 'BIR-263', title: 'Drag-to-reorder columns on the board view',         tag: 'feat',  est: 'M', owner: 'JM', col: 'later' },
+  { id: 'BIR-209', title: 'Upgrade Postgres minor + reindex search vectors',   tag: 'chore', est: 'M', owner: 'AK', col: 'later' },
+  { id: 'BIR-251', title: 'Per-doc read receipts in the share dialog',         tag: 'feat',  est: 'L', owner: 'JM', col: 'later' },
+  { id: 'BIR-240', title: 'Onboarding checklist resurfaces after dismissal',   tag: 'bug',   est: 'S', owner: 'TN', col: 'later' },
+  { id: 'BIR-265', title: 'Add request-id to client error reports',            tag: 'debt',  est: 'S', owner: 'RS', col: 'later' },
+
+  { id: 'BIR-198', title: 'Custom emoji reactions on comments',                tag: 'feat',  est: 'M', owner: 'EL', col: 'cut' },
+  { id: 'BIR-204', title: 'Native Windows desktop wrapper',                    tag: 'feat',  est: 'L', owner: 'TN', col: 'cut' },
+  { id: 'BIR-217', title: 'AI summary of long comment threads',                tag: 'feat',  est: 'L', owner: 'JM', col: 'cut' },
+  { id: 'BIR-233', title: 'Public roadmap page with voting',                   tag: 'feat',  est: 'L', owner: 'RS', col: 'cut' }
+];
+
+var OWNER_CLASS = { AK: 'o1', JM: 'o2', RS: 'o3', TN: 'o4', EL: 'o1' };
+
+var tickets = [];          // live state
+var activeFilter = null;   // tag string or null
+var dragId = null;
+
+// ---------- build DOM ----------
+var board = document.getElementById('board');
+var colBodies = {};
+var colCounts = {};
+var colFoots = {};
+
+COLUMNS.forEach(function (c) {
+  var col = document.createElement('section');
+  col.className = 'col';
+  col.dataset.col = c.key;
+
+  var head = document.createElement('div');
+  head.className = 'col-head';
+  var h2 = document.createElement('h2');
+  h2.textContent = c.label;
+  var count = document.createElement('span');
+  count.className = 'count';
+  head.appendChild(h2);
+  head.appendChild(count);
+
+  var body = document.createElement('div');
+  body.className = 'col-body';
+
+  var foot = document.createElement('div');
+  foot.className = 'col-foot';
+
+  col.appendChild(head);
+  col.appendChild(body);
+  col.appendChild(foot);
+  board.appendChild(col);
+
+  colBodies[c.key] = body;
+  colCounts[c.key] = count;
+  colFoots[c.key] = foot;
+
+  // drop targets
+  col.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    col.classList.add('dragover');
+  });
+  col.addEventListener('dragleave', function (e) {
+    if (!col.contains(e.relatedTarget)) col.classList.remove('dragover');
+  });
+  col.addEventListener('drop', function (e) {
+    e.preventDefault();
+    col.classList.remove('dragover');
+    if (!dragId) return;
+    var t = tickets.find(function (x) { return x.id === dragId; });
+    if (t && t.col !== c.key) { t.col = c.key; render(); }
+  });
+});
+
+function makeCard(t) {
+  var card = document.createElement('article');
+  card.className = 'ticket';
+  card.draggable = true;
+  card.dataset.id = t.id;
+  if (activeFilter && t.tag !== activeFilter) card.classList.add('dim');
+
+  var top = document.createElement('div');
+  top.className = 'ticket-top';
+  var tid = document.createElement('span');
+  tid.className = 'tid';
+  tid.textContent = t.id;
+  var tag = document.createElement('button');
+  tag.type = 'button';
+  tag.className = 'tag tag-' + t.tag;
+  tag.textContent = t.tag;
+  tag.addEventListener('click', function (e) {
+    e.stopPropagation();
+    activeFilter = (activeFilter === t.tag) ? null : t.tag;
+    render();
+  });
+  var est = document.createElement('span');
+  est.className = 'est';
+  est.textContent = t.est;
+  top.appendChild(tid);
+  top.appendChild(tag);
+  top.appendChild(est);
+
+  var title = document.createElement('div');
+  title.className = 'ttitle';
+  title.textContent = t.title;
+
+  var bot = document.createElement('div');
+  bot.className = 'ticket-bot';
+  var owner = document.createElement('span');
+  owner.className = 'owner ' + (OWNER_CLASS[t.owner] || 'o1');
+  owner.textContent = t.owner;
+  bot.appendChild(owner);
+
+  card.appendChild(top);
+  card.appendChild(title);
+  card.appendChild(bot);
+
+  card.addEventListener('dragstart', function (e) {
+    dragId = t.id;
+    card.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', t.id);
+  });
+  card.addEventListener('dragend', function () {
+    dragId = null;
+    card.classList.remove('dragging');
+    document.querySelectorAll('.col.dragover').forEach(function (el) {
+      el.classList.remove('dragover');
+    });
+  });
+
+  return card;
+}
+
+function render() {
+  COLUMNS.forEach(function (c) { colBodies[c.key].innerHTML = ''; });
+  var counts = {};
+  var pts = {};
+  COLUMNS.forEach(function (c) { counts[c.key] = 0; pts[c.key] = 0; });
+
+  tickets.forEach(function (t) {
+    colBodies[t.col].appendChild(makeCard(t));
+    counts[t.col] += 1;
+    pts[t.col] += EST_PTS[t.est] || 0;
+  });
+
+  COLUMNS.forEach(function (c) {
+    colCounts[c.key].textContent = counts[c.key];
+    colFoots[c.key].innerHTML = 'estimate <b>' + pts[c.key] + ' pt' + (pts[c.key] === 1 ? '' : 's') + '</b>';
+  });
+
+  var summary = document.getElementById('summary');
+  summary.innerHTML = COLUMNS.map(function (c) {
+    return '<b>' + counts[c.key] + '</b>&nbsp;' + c.key;
+  }).join('<span class="dot">·</span>');
+
+  var badge = document.getElementById('filterBadge');
+  if (activeFilter) {
+    badge.textContent = 'filter: ' + activeFilter + ' ×';
+    badge.classList.add('on');
+  } else {
+    badge.classList.remove('on');
+  }
+}
+
+document.getElementById('filterBadge').addEventListener('click', function () {
+  activeFilter = null;
+  render();
+});
+
+// ---------- export ----------
+function buildMarkdown() {
+  var lines = [];
+  lines.push('# Acme — Cycle 14 triage');
+  lines.push('');
+  COLUMNS.forEach(function (c) {
+    var rows = tickets.filter(function (t) { return t.col === c.key; });
+    var pts = rows.reduce(function (s, t) { return s + (EST_PTS[t.est] || 0); }, 0);
+    lines.push('## ' + c.label + ' (' + rows.length + ' · ' + pts + ' pts)');
+    lines.push('');
+    lines.push('_' + c.rationale + '_');
+    lines.push('');
+    rows.forEach(function (t) {
+      lines.push('- **' + t.id + '** ' + t.title + ' — ' + t.tag + ', ' + t.est + ', ' + t.owner);
+    });
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+var copyBtn = document.getElementById('copyBtn');
+var copyTimer = null;
+copyBtn.addEventListener('click', function () {
+  var md = buildMarkdown();
+  function flash() {
+    copyBtn.textContent = 'Copied ✓';
+    copyBtn.classList.add('copied');
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(function () {
+      copyBtn.textContent = 'Copy as markdown';
+      copyBtn.classList.remove('copied');
+    }, 1200);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(md).then(flash, flash);
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = md;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    flash();
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', function () {
+  tickets = INITIAL.map(function (t) { return Object.assign({}, t); });
+  activeFilter = null;
+  render();
+});
+
+// ---------- init ----------
+tickets = INITIAL.map(function (t) { return Object.assign({}, t); });
+render();
+
+</script>
+</body>
+</html>

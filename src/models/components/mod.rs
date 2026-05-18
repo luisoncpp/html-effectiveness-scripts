@@ -1,6 +1,15 @@
 use minijinja::Value;
 
+pub mod board_layout;
+pub mod card;
+pub mod code_panel;
+pub mod data_grid;
+pub mod flowchart;
+pub mod module_map;
+pub mod notice;
 pub mod prompt_box;
+pub mod svg_canvas;
+pub mod timeline;
 pub mod triage_board;
 
 pub trait ComponentStrategy {

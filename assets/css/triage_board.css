@@ -23,10 +23,6 @@ html, body {
   font-size: 14px;
   line-height: 1.5;
 }
-body {
-  max-width: none;
-  padding: 0;
-}
 .wrap {
   max-width: 1180px;
   margin: 0 auto;

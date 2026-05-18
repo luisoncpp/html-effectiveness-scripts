@@ -1,6 +1,20 @@
 :root {
-    --color-primary: #64748b;
-    --color-bg: #f1f5f9;
-    --color-surface: #ffffff;
-    --color-text: #334155;
+    --ivory: #FAF9F5;
+    --slate: #141413;
+    --clay: #D97757;
+    --clay-d: #B85C3E;
+    --oat: #E3DACC;
+    --olive: #788C5D;
+    --rust: #B04A3F;
+    --gray-50: #F0EEE6;
+    --gray-150: #F0EEE6;
+    --gray-200: #D1CFC5;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --gray-800: #3D3D3A;
+    --white: #ffffff;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
 }

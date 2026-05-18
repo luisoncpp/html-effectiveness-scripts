@@ -19,8 +19,44 @@ impl TemplateEngine {
             include_str!("../templates/components/prompt_box.html"),
         )?;
         env.add_template(
+            "svg_canvas",
+            include_str!("../templates/components/svg_canvas.html"),
+        )?;
+        env.add_template(
             "triage_board",
             include_str!("../templates/components/triage_board.html"),
+        )?;
+        env.add_template(
+            "notice",
+            include_str!("../templates/components/notice.html"),
+        )?;
+        env.add_template(
+            "card",
+            include_str!("../templates/components/card.html"),
+        )?;
+        env.add_template(
+            "data_grid",
+            include_str!("../templates/components/data_grid.html"),
+        )?;
+        env.add_template(
+            "timeline",
+            include_str!("../templates/components/timeline.html"),
+        )?;
+        env.add_template(
+            "code_panel",
+            include_str!("../templates/components/code_panel.html"),
+        )?;
+        env.add_template(
+            "board_layout",
+            include_str!("../templates/components/board_layout.html"),
+        )?;
+        env.add_template(
+            "flowchart",
+            include_str!("../templates/components/flowchart.html"),
+        )?;
+        env.add_template(
+            "module_map",
+            include_str!("../templates/components/module_map.html"),
         )?;
         Ok(Self { env })
     }
@@ -221,7 +257,7 @@ mod tests {
             .with_base_assets();
         let html = render_document(&parsed, &engine, &registry).unwrap();
         assert!(html.contains("<style>"));
-        assert!(html.contains("--color-primary: #64748b"));
+        assert!(html.contains("--ivory: #FAF9F5"));
     }
 
     #[test]

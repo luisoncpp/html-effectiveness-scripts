@@ -1,0 +1,12 @@
+<div class="card card--elevation-{{ elevation }}">
+    {% if title %}<div class="card__title">{{ title }}</div>{% endif %}
+    {% if tags %}
+    <div class="card__tags">
+        {% for tag in tags %}<span class="card__tag">{{ tag }}</span>{% endfor %}
+    </div>
+    {% endif %}
+    {% if content %}<div class="card__content">{{ content|safe }}</div>{% endif %}
+    {% if children %}
+    <div class="card__children">{{ children }}</div>
+    {% endif %}
+</div>

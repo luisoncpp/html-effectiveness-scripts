@@ -1,0 +1,17 @@
+<table class="data-grid">
+    <thead>
+        <tr>
+            {% for col in columns %}<th>{{ col|safe }}</th>{% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            {% for cell in row %}<td>{{ cell|safe }}</td>{% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if children %}
+<div class="data-grid__children">{{ children }}</div>
+{% endif %}

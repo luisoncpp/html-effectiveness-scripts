@@ -1,0 +1,121 @@
+<div class="sheet flowchart-sheet">
+  <header>
+    <div class="eyebrow">Illustrations &amp; Diagrams · Flowchart</div>
+    <h1>{{ title|safe }}</h1>
+    {% if description %}
+    <p class="lead">{{ description|safe }}</p>
+    {% endif %}
+  </header>
+
+  <div class="layout">
+    <div>
+      <div class="canvas">
+        <svg class="flow" viewBox="{{ view_box }}">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#87867F"/>
+            </marker>
+            <marker id="arrow-rust" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#B04A3F"/>
+            </marker>
+            <marker id="arrow-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#788C5D"/>
+            </marker>
+          </defs>
+
+          <!-- edges -->
+          {% for edge in edges %}
+          <path class="edge{% if edge.edge_type == 'yes' %} yes{% elif edge.edge_type == 'no' %} no{% endif %}"
+                d="{{ edge.d }}"
+                marker-end="{% if edge.edge_type == 'yes' %}url(#arrow-olive){% elif edge.edge_type == 'no' %}url(#arrow-rust){% else %}url(#arrow){% endif %}"/>
+          {% if edge.label %}
+          <text class="lbl" x="0" y="0">{{ edge.label|safe }}</text>
+          {% endif %}
+          {% endfor %}
+
+          <!-- nodes -->
+          {% for node in nodes %}
+          <g class="node {{ node.node_type }}"
+             {% if node.detail_idx is not none %}data-idx="{{ node.detail_idx }}"{% endif %}>
+            {% if node.node_type == "diamond" %}
+            <path d="M{{ node.x + node.width // 2 }},{{ node.y }} L{{ node.x + node.width }},{{ node.y + node.height // 2 }} L{{ node.x + node.width // 2 }},{{ node.y + node.height }} L{{ node.x }},{{ node.y + node.height // 2 }} Z"/>
+            {% else %}
+            <rect x="{{ node.x }}" y="{{ node.y }}" width="{{ node.width }}" height="{{ node.height }}"/>
+            {% endif %}
+            <text x="{{ node.x + node.width // 2 }}" y="{{ node.y + node.height // 2 + 4 }}" text-anchor="middle">{{ node.label|safe }}</text>
+            {% if node.sublabel %}
+            <text class="sub" x="{{ node.x + node.width // 2 }}" y="{{ node.y + node.height // 2 + 20 }}" text-anchor="middle">{{ node.sublabel|safe }}</text>
+            {% endif %}
+          </g>
+          {% endfor %}
+        </svg>
+      </div>
+
+      <div class="legend">
+        <span><i class="chip"></i> process step</span>
+        <span><i class="chip gate"></i> decision</span>
+        <span><i class="chip ok"></i> terminal success</span>
+        <span><i class="chip bad"></i> failure path</span>
+      </div>
+    </div>
+
+    <aside id="panel">
+      <div class="hint">Click a step in the chart →</div>
+      {% if details|length > 0 %}
+      <h3 id="p-title">{{ details[0].title|safe }}</h3>
+      <div class="meta" id="p-meta">{{ details[0].meta|safe }}</div>
+      <p id="p-body">{{ details[0].body|safe }}</p>
+      {% if details[0].code %}
+      <pre id="p-code">{{ details[0].code|safe }}</pre>
+      {% endif %}
+      {% endif %}
+    </aside>
+  </div>
+
+  {% for detail in details %}
+  <template id="detail-{{ loop.index0 }}">
+    <h3>{{ detail.title|safe }}</h3>
+    <div class="meta">{{ detail.meta|safe }}</div>
+    <p>{{ detail.body|safe }}</p>
+    {% if detail.code %}
+    <pre>{{ detail.code|safe }}</pre>
+    {% endif %}
+  </template>
+  {% endfor %}
+</div>
+
+<script>
+(function() {
+  const root = document.querySelector(".flowchart-sheet");
+  if (!root) return;
+  const nodes = root.querySelectorAll(".node");
+  const panel = root.querySelector("aside");
+  if (!panel) return;
+  const hint = panel.querySelector(".hint");
+
+  function activate(idx) {
+    nodes.forEach(function(x) { x.classList.remove("active"); });
+    const node = root.querySelector('.node[data-idx="' + idx + '"]');
+    if (node) node.classList.add("active");
+    const tmpl = document.getElementById("detail-" + idx);
+    if (!tmpl) return;
+    const frag = tmpl.content.cloneNode(true);
+    panel.innerHTML = "";
+    panel.appendChild(frag);
+  }
+
+  nodes.forEach(function(n) {
+    n.addEventListener("click", function() {
+      const idx = n.dataset.idx;
+      if (idx !== undefined) activate(idx);
+    });
+  });
+
+  if (nodes.length > 0 && nodes[0].dataset.idx !== undefined) {
+    activate(nodes[0].dataset.idx);
+  }
+})();
+</script>
+{% if children %}
+<div class="flowchart__children">{{ children }}</div>
+{% endif %}

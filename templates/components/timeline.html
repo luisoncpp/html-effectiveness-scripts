@@ -1,0 +1,29 @@
+<ol class="timeline timeline--{{ orientation }}">
+    <div class="milestones">
+        {% for step in steps %}
+        <div class="milestone">
+            <div class="when">{{ step.timestamp }}</div>
+            <div class="dot-col">
+                <span class="dot{% if step.step_type == 'done' %} done{% endif %}"></span>
+                {% if not loop.last %}<span class="line"></span>{% endif %}
+            </div>
+            <div class="body">
+                <h3>{{ step.title|safe }}</h3>
+                {% if step.description %}
+                <p>{{ step.description|safe }}</p>
+                {% endif %}
+                {% if step.tags %}
+                <div class="tags">
+                    {% for tag in step.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</ol>
+{% if children %}
+<div class="timeline__children">{{ children }}</div>
+{% endif %}

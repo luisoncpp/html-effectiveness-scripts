@@ -1,0 +1,13 @@
+<div class="board-layout board-layout--{{ variant }}">
+    {% for column in columns %}
+    <div class="board-column">
+        <div class="board-column__title">{{ column.title }}</div>
+        {% for item in column.items %}
+        <div class="board-item">{{ item|safe }}</div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+{% if children %}
+<div class="board-layout__children">{{ children }}</div>
+{% endif %}

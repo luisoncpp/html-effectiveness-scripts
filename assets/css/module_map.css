@@ -1,0 +1,52 @@
+.module-map {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.module-map h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 26px;
+  color: var(--slate);
+  margin-bottom: 14px;
+}
+
+.module-map .canvas {
+  border: 1.5px solid var(--gray-300);
+  border-radius: 12px;
+  background: #fff;
+  padding: 28px;
+  overflow-x: auto;
+}
+
+.module-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.module-map text {
+  font-family: var(--mono);
+  font-size: 12px;
+  fill: var(--slate);
+}
+
+.module-map .node rect {
+  fill: #fff;
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+  rx: 8;
+}
+
+.module-map .node.highlight rect {
+  fill: var(--gray-150);
+  stroke: var(--slate);
+  stroke-width: 2;
+}
+
+.module-map .edge {
+  stroke: var(--gray-500);
+  stroke-width: 1.5;
+  fill: none;
+  marker-end: url(#arrow);
+}

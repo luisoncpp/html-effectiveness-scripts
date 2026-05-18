@@ -1,3 +1,5 @@
+Read @docs/architecture.md before doing anything else.
+
 * Do not make function with more than 3 parameters.
 
 * Do not make functions longer than 50 lines.
