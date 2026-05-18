@@ -1,10 +1,15 @@
 <div class="board-layout board-layout--{{ variant }}">
     {% for column in columns %}
     <div class="board-column">
-        <div class="board-column__title">{{ column.title }}</div>
-        {% for item in column.items %}
-        <div class="board-item">{{ item|safe }}</div>
-        {% endfor %}
+        <div class="board-column__header">
+            <div class="board-column__title">{{ column.title }}</div>
+            <span class="board-column__count">{{ column.items|length }}</span>
+        </div>
+        <div class="board-column__body">
+            {% for item in column.items %}
+            <div class="board-item">{{ item|safe }}</div>
+            {% endfor %}
+        </div>
     </div>
     {% endfor %}
 </div>
