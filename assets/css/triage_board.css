@@ -46,7 +46,7 @@ h1 {
   margin: 6px 0 4px;
 }
 .sub {
-  color: var(--gray-500);
+  color: var(--gray-800);
   max-width: 620px;
   margin: 0;
 }

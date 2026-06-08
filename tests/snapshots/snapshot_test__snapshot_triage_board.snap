@@ -1,6 +1,5 @@
 ---
 source: tests/snapshot_test.rs
-assertion_line: 53
 expression: html
 ---
 <!DOCTYPE html>
@@ -148,7 +147,7 @@ blockquote {
     border-left: 3px solid var(--clay);
     padding-left: 1em;
     margin: 0 0 1em;
-    color: var(--gray-500);
+    color: var(--gray-700);
 }
 
 hr {
@@ -205,7 +204,7 @@ h1 {
   margin: 6px 0 4px;
 }
 .sub {
-  color: var(--gray-500);
+  color: var(--gray-800);
   max-width: 620px;
   margin: 0;
 }

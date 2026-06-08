@@ -57,7 +57,7 @@
 .card__content {
     font-size: 14px;
     line-height: 1.55;
-    color: var(--gray-500);
+    color: var(--gray-700);
 }
 
 .card__content p:last-child {

@@ -20,10 +20,11 @@ impl ComponentStrategy for NoticeData {
     }
 
     fn render_context(&self, children_html: &str) -> Value {
+        let content_html = super::render_markdown(&self.content);
         context! {
             variant => &self.variant,
             icon => &self.icon,
-            content => &self.content,
+            content => content_html,
             children => children_html,
         }
     }

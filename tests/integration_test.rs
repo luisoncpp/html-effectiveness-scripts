@@ -367,3 +367,28 @@ fn all_primitives_markdown_renders_every_component() {
     assert!(!html.contains("type: module-map"));
     assert!(!html.contains("type: triage-board"));
 }
+
+#[test]
+fn component_markdown_rendering_regression_test() {
+    let input = PathBuf::from("tests/fixtures/regression_markdown.md");
+    let output = PathBuf::from("tests/fixtures/regression_markdown_output.html");
+
+    let args = CliArgs {
+        input,
+        output: output.clone(),
+    };
+
+    let result = compiler::run_compilation(&args);
+    assert!(result.is_ok());
+
+    let html = std::fs::read_to_string(&output).unwrap();
+    let _ = std::fs::remove_file(&output);
+
+    // Verify card markdown list and code
+    assert!(html.contains("<li>Item 1</li>"));
+    assert!(html.contains("<li>Item 2 with <code>inline code</code></li>"));
+
+    // Verify notice markdown bold formatting
+    assert!(html.contains("This is notice text with <strong>bold formatting</strong>."));
+}
+

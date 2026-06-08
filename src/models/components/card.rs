@@ -27,11 +27,12 @@ impl ComponentStrategy for CardData {
     }
 
     fn render_context(&self, children_html: &str) -> Value {
+        let content_html = self.content.as_deref().map(super::render_markdown);
         context! {
             title => &self.title,
             elevation => &self.elevation,
             tags => &self.tags,
-            content => &self.content,
+            content => content_html,
             children => children_html,
         }
     }
