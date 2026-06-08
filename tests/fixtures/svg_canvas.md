@@ -20,4 +20,10 @@ elements:
     x: 10
     y: 10
     text: "Hello SVG"
+  - type: edge
+    x: 110
+    y: 40
+    x2: 200
+    y2: 200
+    class: "edge"
 ```

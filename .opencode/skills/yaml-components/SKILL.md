@@ -196,6 +196,12 @@ elements:
     x: 10
     y: 10
     text: "Hello SVG"
+  - type: edge
+    x: 110
+    y: 40
+    x2: 200
+    y2: 200
+    class: "edge"
 ```
 
 - `viewBox`: SVG viewBox attribute. Defaults to `"0 0 800 600"`.
@@ -205,10 +211,15 @@ elements:
   - Coordinates (`x`, `y`, `width`, `height`, `cx`, `cy`, `r`) are optional depending on element type.
   - `class`: Optional CSS class string.
   - `text`: Text content for `text` elements.
+  - `marker`: Optional SVG marker id (without `#`) for `edge` elements. Emitted as `marker-end="url(#<marker>)"`.
+
+#### `edge` element
+
+The `edge` element renders an SVG `<line>`. The start point is `(x, y)` and the end point is `(x2, y2)` (absolute coordinates, not offsets). All four of `x`, `y`, `x2`, `y2` must be provided; any missing component drops the corresponding `x1`/`y1`/`x2`/`y2` attribute. The bundled `.edge` class in `assets/css/svg_canvas.css` provides a sensible default stroke. `width` and `height` are ignored on `edge` elements.
 
 ### 8. PromptBox (Legacy)
 
-```yaml
+<!-- ```yaml -->
 type: prompt-box
 label: My Prompt
 content: This is prompt content.
@@ -261,19 +272,6 @@ The parser:
 | `Unsupported child block type` | A child in `children` lacks a `type` key. |
 | Missing styles in output | Component CSS not registered in `assets.rs` `resolve_asset()`. |
 | Render error comment in HTML | Template name mismatch or missing template registration in `renderer.rs`. |
-
-## File Locations
-
-When adding a new primitive, touch these files:
-
-1. `src/models/components/<name>.rs` — Data struct + `ComponentStrategy` impl.
-2. `src/models/components/mod.rs` — Add `pub mod <name>;`.
-3. `src/models/ui_component.rs` — Add enum variant + match arm + tests.
-4. `templates/components/<name>.html` — MiniJinja template.
-5. `assets/css/<name>.css` — Component styles (and `assets/js/<name>.js` if needed).
-6. `src/renderer.rs` — Register template in `TemplateEngine::new()`.
-7. `src/assets.rs` — Register asset path in `resolve_asset()`.
-8. `tests/fixtures/<name>.md` — Example Markdown file.
-9. `tests/integration_test.rs` — Integration test for the fixture.
+| Code not being rendered and unexpected formatting change | Using `<` `>` characters in content without escaping them (use either `&lt;` `&gt;` or backquotes) |
 
 The compiler produces a fully self-contained HTML file with zero external asset links.

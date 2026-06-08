@@ -9,6 +9,8 @@ pub struct SvgElement {
     pub element_type: String,
     pub x: Option<u32>,
     pub y: Option<u32>,
+    pub x2: Option<u32>,
+    pub y2: Option<u32>,
     pub width: Option<u32>,
     pub height: Option<u32>,
     pub cx: Option<u32>,
@@ -16,8 +18,6 @@ pub struct SvgElement {
     pub r: Option<u32>,
     pub class: Option<String>,
     pub text: Option<String>,
-    pub from: Option<String>,
-    pub to: Option<String>,
     pub marker: Option<String>,
 }
 

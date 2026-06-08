@@ -6,6 +6,8 @@ This document describes the currently implemented architecture of the Rust UI Co
 
 The application is a command-line micro Static Site Generator (SSG). It reads hybrid Markdown files containing YAML frontmatter, standard prose, and embedded fenced YAML component blocks. The parser produces a block-based AST (`Vec<Block>`) with `Prose` (raw HTML) and `Component` (deserialized structs) variants. The renderer walks the AST, dispatching each component to its MiniJinja template with children rendered recursively. CSS and JavaScript assets are tracked per component via an `AssetRegistry`, resolved at build time with `include_str!`, and inlined into the final self-contained HTML file. Frontmatter configures document-level settings (title, layout width, theme tokens).
 
+The compiler supports 11 component primitives: `notice`, `card`, `data-grid`, `timeline`, `code-panel`, `board-layout`, `svg-canvas`, `prompt-box`, `triage-board`, `flowchart`, and `module-map`.
+
 ## 2. Directory Structure
 
 ```text
@@ -24,35 +26,73 @@ src/
 │   ├── document_context.rs # Frontmatter model (title, layout, theme)
 │   ├── ui_component.rs   # Internally-tagged enum; ComponentBlock wrapper
 │   └── components/
-│       ├── mod.rs
-│       ├── prompt_box.rs # Data struct for prompt-box
-│       └── triage_board.rs # Data struct for triage-board
+│       ├── mod.rs        # ComponentStrategy trait + module declarations
+│       ├── board_layout.rs   # Data struct for board-layout
+│       ├── card.rs            # Data struct for card
+│       ├── code_panel.rs      # Data struct for code-panel
+│       ├── data_grid.rs       # Data struct for data-grid
+│       ├── flowchart.rs       # Data struct for flowchart
+│       ├── module_map.rs      # Data struct for module-map
+│       ├── notice.rs          # Data struct for notice
+│       ├── prompt_box.rs      # Data struct for prompt-box
+│       ├── svg_canvas.rs      # Data struct for svg-canvas
+│       ├── timeline.rs        # Data struct for timeline
+│       └── triage_board.rs    # Data struct for triage-board
 
 assets/
 ├── css/
-│   ├── base.css          # Global layout & typography reset
-│   ├── prompt_box.css    # Prompt-box component styles
-│   └── triage_board.css  # Triage-board Kanban layout styles
+│   ├── base.css            # Global layout & typography reset
+│   ├── board_layout.css    # Board-layout component styles
+│   ├── card.css            # Card component styles
+│   ├── code_panel.css      # Code-panel component styles
+│   ├── data_grid.css       # Data-grid component styles
+│   ├── flowchart.css       # Flowchart component styles
+│   ├── module_map.css      # Module-map component styles
+│   ├── notice.css          # Notice component styles
+│   ├── prompt_box.css      # Prompt-box component styles
+│   ├── svg_canvas.css      # Svg-canvas component styles
+│   ├── timeline.css        # Timeline component styles
+│   └── triage_board.css    # Triage-board Kanban layout styles
 ├── js/
-│   ├── triage_board.js   # Drag-and-drop board interactivity
-│   └── test.js           # Test-only asset (used in unit tests)
+│   ├── data_grid.js        # Data-grid table interactivity
+│   ├── flowchart.js        # Flowchart detail expansion
+│   ├── tabs.js             # Code-panel tab switching
+│   ├── test.js             # Test-only asset (used in unit tests)
+│   └── triage_board.js     # Drag-and-drop board interactivity
 └── tokens/
-    └── clay-slate.css    # Theme token overrides
+    └── clay-slate.css      # Theme token overrides
 
 templates/
-├── base.html             # Global HTML shell (title, layout class, inline slots)
+├── base.html                 # Global HTML shell (title, layout class, inline slots)
 └── components/
-    ├── prompt_box.html   # Prompt-box markup with children slot
-    └── triage_board.html # Triage-board header/toolbar/board markup + children slot
+    ├── board_layout.html     # Kanban / grid / slides markup + children slot
+    ├── card.html             # Card markup + children slot
+    ├── code_panel.html       # Tabs + diff panels + children slot
+    ├── data_grid.html        # Table markup + children slot
+    ├── flowchart.html        # SVG nodes/edges + children slot
+    ├── module_map.html       # SVG nodes/edges + children slot
+    ├── notice.html           # Callout markup + children slot
+    ├── prompt_box.html       # Prompt-box markup + children slot
+    ├── svg_canvas.html       # SVG wrapper + children slot
+    ├── timeline.html         # Step list + children slot
+    └── triage_board.html     # Header/toolbar/board markup + children slot
 
 tests/
 ├── integration_test.rs   # End-to-end pipeline tests against fixture files
 ├── snapshot_test.rs      # Layout regression tests using insta
 ├── fixtures/
-│   ├── basic.md            # Standard markdown (no frontmatter, no components)
-│   ├── hybrid.md           # Prose + single YAML component
-│   ├── triage_board.md     # Frontmatter + triage-board component
-│   └── test_phase1.md      # Frontmatter + nested children
+│   ├── all_primitives.md     # All 11 components in one document
+│   ├── basic.md              # Standard markdown (no frontmatter, no components)
+│   ├── board_layout.md       # Board-layout component
+│   ├── card.md               # Card with nested child
+│   ├── code_panel.md         # Code-panel with tabs
+│   ├── data_grid.md          # Data-grid component
+│   ├── hybrid.md             # Prose + single YAML component
+│   ├── notice.md             # Notice component
+│   ├── svg_canvas.md         # Svg-canvas component
+│   ├── test_phase1.md        # Frontmatter + nested children
+│   ├── timeline.md           # Timeline component
+│   └── triage_board.md       # Frontmatter + triage-board component
 └── snapshots/
     ├── snapshot_test__snapshot_basic_markdown.snap
     ├── snapshot_test__snapshot_hybrid_markdown.snap
@@ -118,7 +158,7 @@ The compiler executes the following stages in sequence inside `compiler::run_com
 
 * **Responsibility:** Thin serde-enabled enum wrapping component strategies. No per-variant behavior lives here.
 * **Enum:** `UiComponent` uses `#[serde(tag = "type")]` for internally tagged polymorphism.
-* **Variants:** `PromptBox(PromptBoxData)`, `TriageBoard(TriageBoardData)`.
+* **Variants:** `Card`, `Notice`, `PromptBox`, `SvgCanvas`, `DataGrid`, `Timeline`, `CodePanel`, `BoardLayout`, `TriageBoard`, `Flowchart`, `ModuleMap`.
 * **Struct:** `ComponentBlock { component: UiComponent, children: Vec<Block> }` wraps a component with its nested AST.
 * **Dispatch:** All methods (`required_assets()`, `template_name()`, `render_context()`) delegate to the `ComponentStrategy` trait via a single `strategy()` helper match. Adding a new component requires only adding the enum variant + module — no render or asset logic changes in this file.
 * **Fail-fast:** Unknown types or missing required fields result in a deserialization `Err`, which propagates up and halts compilation.
@@ -127,7 +167,7 @@ The compiler executes the following stages in sequence inside `compiler::run_com
 
 * **Responsibility:** Each component module defines its data struct and implements the `ComponentStrategy` trait locally.
 * **Trait:** `ComponentStrategy { required_assets(), template_name(), render_context() }` — every component owns its asset declarations, template binding, and minijinja context construction.
-* **Modules:** `prompt_box.rs` (PromptBoxData), `triage_board.rs` (TriageBoardData).
+* **Modules:** `board_layout.rs`, `card.rs`, `code_panel.rs`, `data_grid.rs`, `flowchart.rs`, `module_map.rs`, `notice.rs`, `prompt_box.rs`, `svg_canvas.rs`, `timeline.rs`, `triage_board.rs`.
 * **Key Design Decision:** Component behavior is colocated with component data. Adding a new component touches only its own file and `components/mod.rs` (module declaration).
 
 ### `models::base.rs`
@@ -142,15 +182,14 @@ The compiler executes the following stages in sequence inside `compiler::run_com
 * **Struct:** `TemplateEngine` wraps `minijinja::Environment<'static>`.
 * **Templates:** Loaded at build time via `include_str!`:
   * `base.html` — Global shell with `{{ content }}`, `{{ title }}`, `{{ inline_styles }}`, `{{ inline_scripts }}`, and layout class.
-  * `prompt_box.html` — Component markup with `{% if children %}` conditional slot.
-  * `triage_board.html` — Component markup with `{{ children }}` slot for nested content.
+  * `board_layout.html`, `card.html`, `code_panel.html`, `data_grid.html`, `flowchart.html`, `module_map.html`, `notice.html`, `prompt_box.html`, `svg_canvas.html`, `timeline.html`, `triage_board.html` — Component markup, each with a `{% if children %}` conditional slot.
 * **`render_document`**: Walks blocks, renders components recursively, wraps result in base template.
 
 ### `assets.rs`
 
 * **Responsibility:** Collects, deduplicates, resolves, and inlines component CSS and JS.
 * **Struct:** `AssetRegistry { stylesheets: BTreeSet<String>, scripts: BTreeSet<String> }`.
-* **`from_blocks()`**: Walks the AST, calling `required_assets()` on each component variant.
+* **`from_blocks()`**: Walks the AST (recursively through children), calling `required_assets()` on each component variant.
 * **`with_theme()`**: Adds token CSS (e.g., `tokens/clay-slate.css`) if a theme is set in frontmatter.
 * **`with_base_assets()`**: Adds the global `css/base.css`.
 * **`inline_styles()` / `inline_scripts()`**: Reads each asset file via `include_str!` (resolved in `resolve_asset`), concatenates, and wraps in `<style>` / `<script>` tags.
@@ -162,8 +201,13 @@ The output HTML is fully self-contained. Templates live in `templates/` and are 
 
 * **base.css** defines `:root` CSS custom properties and global typography. The default layout is a `max-width: 65ch` reading column.
 * **Theme tokens** (e.g., `clay-slate.css`) override `:root` variables to customize the color palette. Activated via frontmatter `theme` field.
-* **Component CSS** (e.g., `prompt_box.css`, `triage_board.css`) use the CSS variables for colors, spacing, borders, and typography.
-* **Component JS** (e.g., `triage_board.js`) provides interactive behavior — the triage board includes full drag-and-drop Kanban logic, tag filtering, and clipboard export, all self-contained in a single `<script>` tag.
+* **Component CSS** uses the CSS variables for colors, spacing, borders, and typography.
+* **Component JS** provides interactive behavior:
+  * `triage_board.js` — Full drag-and-drop Kanban logic, tag filtering, and clipboard export.
+  * `tabs.js` — Code-panel tab switching.
+  * `data_grid.js` — Data-grid table interactivity.
+  * `flowchart.js` — Flowchart detail expansion.
+* All JS is emitted in a single inline `<script>` tag, with no external dependencies.
 
 ## 6. Component Strategy Pattern
 
@@ -176,6 +220,7 @@ Adding a new UI component requires these steps:
 3. **Module:** Register the module in `components/mod.rs`.
 4. **Template:** Add a `.html` file in `templates/components/` with a `{{ children }}` slot, and register it in `TemplateEngine::new()` in `renderer.rs`.
 5. **Assets:** Add `.css` (and optionally `.js`) files in `assets/css/` and `assets/js/`, and register the paths in `assets.rs`'s `resolve_asset()` function.
+6. **Fixture:** Add a `tests/fixtures/<name>.md` file and an integration test in `tests/integration_test.rs` that asserts the component renders and no raw YAML leaks into the output.
 
 **No per-variant match arms in `ComponentBlock::render()`, `UiComponent::render()`, or `required_assets()`** — the trait dispatch handles it generically.
 
@@ -183,12 +228,12 @@ Adding a new UI component requires these steps:
 
 * **Unit Tests:** Each module has inline `#[cfg(test)]` tests covering happy paths and error paths:
   * `cli.rs`: Flag parsing, missing arguments, unknown flags.
-  * `parser.rs`: Basic prose, frontmatter extraction, single/multiple/nested YAML blocks, unknown types, missing required fields, empty input.
+  * `parser.rs`: Basic prose, frontmatter extraction, single/multiple/nested YAML blocks, cross-component nesting, unknown types, missing required fields, empty input.
   * `renderer.rs`: Template loading, component rendering, children recursion, prose passthrough, title/theme/layout injection, no external links.
-  * `assets.rs`: Empty AST, single/multiple/nested components, deduplication, theme loading, inline content generation.
-  * `ui_component.rs`: YAML deserialization of known/unknown types, missing fields, asset declarations.
+  * `assets.rs`: Empty AST, single/multiple/nested/cross-component assets, deduplication, theme loading, inline content generation.
+  * `ui_component.rs`: YAML deserialization of all 11 known types and their defaults, asset declarations, unknown types, missing fields.
   * `compiler.rs`: File I/O, missing input errors.
-* **Integration Tests:** `tests/integration_test.rs` exercises the full `run_compilation` pipeline against fixture files (`basic.md`, `hybrid.md`), asserting on output HTML content and the absence of raw YAML.
+* **Integration Tests:** `tests/integration_test.rs` exercises the full `run_compilation` pipeline against fixture files (one per component plus `basic.md`, `hybrid.md`, `all_primitives.md`). Each test asserts on output HTML content and the absence of raw YAML. The assertion that no raw YAML leaks must use strings that cannot collide with inlined CSS (e.g. quoted YAML values like `"Task A"`, not bare keys like `items:` that can appear in CSS rules such as `align-items:`).
 * **Snapshot Tests:** `tests/snapshot_test.rs` uses the `insta` crate to capture the entire rendered HTML output of `basic.md`, `hybrid.md`, and `triage_board.md`. Any layout/Markup/CSS regression fails until the snapshot is explicitly reviewed.
 
 ## 8. Key Design Decisions
@@ -204,3 +249,4 @@ Adding a new UI component requires these steps:
 | **Asset registry with BTreeSet deduplication** | Only the assets actually used by the document's components are inlined. Theme tokens are additive on top of the base CSS cascade. |
 | **Layout system** (reading-column / wide / canvas) | Allows components like triage-board to override the default reading-width constraint via frontmatter, enabling full-width dashboards within the same compiler. |
 | **Fakes over mocks** | Unit tests verify observable output (HTML strings, file contents) rather than internal call sequences. |
+| **Collision-aware "no raw YAML" assertions** | Integration tests assert that quoted YAML values (e.g. `"Task A"`) don't leak into the output. Bare YAML keys (e.g. `items:`) are unsafe to assert against because they can appear in inlined CSS rules (e.g. `align-items: start;`). |

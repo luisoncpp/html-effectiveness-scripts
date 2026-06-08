@@ -7,7 +7,7 @@
     {% elif element.type == "text" %}
     <text {% if element.x %}x="{{ element.x }}" {% endif %}{% if element.y %}y="{{ element.y }}" {% endif %}{% if element.class %}class="{{ element.class }}"{% endif %}>{{ element.text|default("") }}</text>
     {% elif element.type == "edge" %}
-    <line {% if element.x %}x1="{{ element.x }}" {% endif %}{% if element.y %}y1="{{ element.y }}" {% endif %}{% if element.x and element.width %}x2="{{ element.x + element.width }}" {% endif %}{% if element.y and element.height %}y2="{{ element.y + element.height }}" {% endif %}{% if element.class %}class="{{ element.class }}" {% endif %}{% if element.marker %}marker-end="url(#{{ element.marker }})"{% endif %}/>
+    <line {% if element.x %}x1="{{ element.x }}" {% endif %}{% if element.y %}y1="{{ element.y }}" {% endif %}{% if element.x2 %}x2="{{ element.x2 }}" {% endif %}{% if element.y2 %}y2="{{ element.y2 }}" {% endif %}{% if element.class %}class="{{ element.class }}" {% endif %}{% if element.marker %}marker-end="url(#{{ element.marker }})"{% endif %}/>
     {% endif %}
     {% endfor %}
 </svg>

@@ -227,7 +227,7 @@ fn board_layout_markdown_renders_component_and_no_raw_yaml() {
     assert!(html.contains("Task C"));
     assert!(!html.contains("type: board-layout"));
     assert!(!html.contains("variant: kanban"));
-    assert!(!html.contains("items:"));
+    assert!(!html.contains("\"Task A\""));
 }
 
 #[test]
@@ -250,6 +250,12 @@ fn svg_canvas_markdown_renders_component_and_no_raw_yaml() {
     assert!(html.contains("<rect"));
     assert!(html.contains("<circle"));
     assert!(html.contains("<text"));
+    assert!(html.contains("<line"));
+    assert!(html.contains(r#"x1="110""#));
+    assert!(html.contains(r#"y1="40""#));
+    assert!(html.contains(r#"x2="200""#));
+    assert!(html.contains(r#"y2="200""#));
+    assert!(html.contains(r#"class="edge""#));
     assert!(!html.contains("type: svg-canvas"));
     assert!(!html.contains("elements:"));
 }
@@ -334,6 +340,9 @@ fn all_primitives_markdown_renders_every_component() {
     assert!(html.contains("svg-canvas"));
     assert!(html.contains("<rect"));
     assert!(html.contains("<circle"));
+    assert!(html.contains("<line"));
+    assert!(html.contains(r#"x2="200""#));
+    assert!(html.contains(r#"y2="100""#));
 
     // Flowchart
     assert!(html.contains("flowchart"));

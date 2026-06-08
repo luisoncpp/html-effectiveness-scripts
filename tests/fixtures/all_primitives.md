@@ -143,6 +143,12 @@ elements:
     x: 10
     y: 100
     text: "Hello SVG"
+  - type: edge
+    x: 110
+    y: 40
+    x2: 200
+    y2: 100
+    class: "edge"
 ```
 
 ## Flowchart
