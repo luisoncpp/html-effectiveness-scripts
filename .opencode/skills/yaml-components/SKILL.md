@@ -1,6 +1,6 @@
 ---
 name: yaml-components
-description: Use when the user is writing, editing, or debugging YAML component blocks in hybrid Markdown files for the Rust UI Compiler. Covers all 9 available primitives (notice, card, data-grid, timeline, board-layout, code-panel, svg-canvas, prompt-box, triage-board), frontmatter config, children nesting rules, and common compilation errors.
+description: Use when the user is writing, editing, or debugging YAML component blocks in hybrid Markdown files for the Rust UI Compiler. Covers all 11 available primitives (notice, card, data-grid, timeline, board-layout, code-panel, svg-canvas, flowchart, module-map, prompt-box, triage-board), frontmatter config, children nesting rules, and common compilation errors.
 ---
 
 # YAML Components Skill
@@ -217,7 +217,89 @@ elements:
 
 The `edge` element renders an SVG `<line>`. The start point is `(x, y)` and the end point is `(x2, y2)` (absolute coordinates, not offsets). All four of `x`, `y`, `x2`, `y2` must be provided; any missing component drops the corresponding `x1`/`y1`/`x2`/`y2` attribute. The bundled `.edge` class in `assets/css/svg_canvas.css` provides a sensible default stroke. `width` and `height` are ignored on `edge` elements.
 
-### 8. PromptBox (Legacy)
+### 8. Flowchart
+
+An interactive SVG-based flowchart layout with an associated detail sidebar.
+
+```yaml
+type: flowchart
+title: "What happens when you git push"
+description: "The deploy pipeline for acme/web."
+viewBox: "0 0 620 400"
+nodes:
+  - id: push
+    type: terminal         # terminal | rect | diamond
+    x: 230
+    y: 12
+    width: 160
+    height: 44
+    label: "git push main"
+    detail_idx: 0          # optional index into details
+  - id: gate
+    type: diamond
+    x: 268
+    y: 262
+    width: 84
+    height: 48
+    label: "pass?"
+    detail_idx: 3
+edges:
+  - from: push
+    to: ci
+    d: "M310,56 L310,92"
+  - from: gate
+    to: done
+    edge_type: yes         # yes | no | normal
+    label: pass
+    d: "M310,310 L310,350"
+details:
+  - title: "git push main"
+    meta: "trigger · 0s"
+    body: "A push or merge to main fires the deploy workflow."
+    code: "on:\n  push:\n    branches: [main]"
+```
+
+- `title`: Header title text.
+- `description`: Optional subheader text.
+- `viewBox`: Viewport configuration.
+- `nodes`: Array of flowchart node coordinates, dimensions, types, labels, and details index.
+- `edges`: Array of connection lines containing path definitions (`d`), type modifiers, and optional labels.
+- `details`: Array of items shown in the detail sidebar when matching nodes are hovered or clicked.
+
+### 9. ModuleMap
+
+A visual dependency/module map representation using SVG blocks and connection edges.
+
+```yaml
+type: module-map
+title: "Module dependencies"
+viewBox: "0 0 600 300"
+nodes:
+  - id: parser
+    label: "parser.rs"
+    x: 50
+    y: 50
+    width: 120
+    height: 50
+    class: highlight       # highlight | optional other classes
+  - id: renderer
+    label: "renderer.rs"
+    x: 250
+    y: 50
+    width: 120
+    height: 50
+edges:
+  - from: parser
+    to: renderer
+    d: "M170,75 L250,75"
+```
+
+- `title`: Map section title.
+- `viewBox`: SVG viewBox attribute.
+- `nodes`: Array of modules including custom styling classes.
+- `edges`: Array of directional paths mapping imports or dependencies.
+
+### 10. PromptBox (Legacy)
 
 <!-- ```yaml -->
 type: prompt-box
@@ -228,7 +310,7 @@ content: This is prompt content.
 - `label`: Header text.
 - `content`: Body text (pre-wrap, monospace).
 
-### 9. TriageBoard (Legacy)
+### 11. TriageBoard (Legacy)
 
 ```yaml
 type: triage-board
