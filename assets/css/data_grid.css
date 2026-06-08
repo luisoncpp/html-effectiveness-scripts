@@ -75,3 +75,9 @@
     background: #E8EDE0;
     color: #5C6F44;
 }
+
+html[data-theme="dark"] .badge--med,
+html[data-theme="dark"] .badge--medium {
+    color: #d8c7a6;
+}
+

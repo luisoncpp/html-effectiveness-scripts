@@ -26,3 +26,8 @@
     stroke: var(--gray-300);
     stroke-width: 1px;
 }
+
+.svg-canvas text {
+    fill: var(--slate);
+}
+

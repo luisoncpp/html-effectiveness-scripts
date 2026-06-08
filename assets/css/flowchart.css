@@ -53,7 +53,7 @@
 .flowchart-sheet .canvas {
   border: 1.5px solid var(--gray-300);
   border-radius: 14px;
-  background: #fff;
+  background: var(--white);
   padding: 28px;
   overflow-x: auto;
 }
@@ -82,7 +82,7 @@
 }
 
 .flowchart-sheet .node rect {
-  fill: #fff;
+  fill: var(--white);
   stroke: var(--gray-300);
   stroke-width: 1.5;
   rx: 8;
@@ -94,7 +94,7 @@
 }
 
 .flowchart-sheet .node.diamond path {
-  fill: #fff;
+  fill: var(--white);
   stroke: var(--gray-300);
   stroke-width: 1.5;
 }
@@ -147,7 +147,7 @@
   top: 24px;
   border: 1.5px solid var(--gray-300);
   border-radius: 14px;
-  background: #fff;
+  background: var(--white);
   padding: 20px 20px 22px;
 }
 
@@ -211,7 +211,7 @@
   height: 14px;
   border: 1.5px solid var(--gray-300);
   border-radius: 4px;
-  background: #fff;
+  background: var(--white);
 }
 
 .flowchart-sheet .chip.gate {

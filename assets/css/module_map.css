@@ -14,7 +14,7 @@
 .module-map .canvas {
   border: 1.5px solid var(--gray-300);
   border-radius: 12px;
-  background: #fff;
+  background: var(--white);
   padding: 28px;
   overflow-x: auto;
 }
@@ -32,7 +32,7 @@
 }
 
 .module-map .node rect {
-  fill: #fff;
+  fill: var(--white);
   stroke: var(--gray-300);
   stroke-width: 1.5;
   rx: 8;
