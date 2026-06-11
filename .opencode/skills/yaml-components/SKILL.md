@@ -1,6 +1,6 @@
 ---
 name: yaml-components
-description: Use when the user is writing, editing, or debugging YAML component blocks in hybrid Markdown files for the Rust UI Compiler. Covers all 11 available primitives (notice, card, data-grid, timeline, board-layout, code-panel, svg-canvas, flowchart, module-map, prompt-box, triage-board), frontmatter config, children nesting rules, and common compilation errors.
+description: Use when the user is writing, editing, or debugging YAML component blocks in hybrid Markdown files for the Rust UI Compiler. Covers all 12 available primitives (notice, card, data-grid, timeline, board-layout, code-panel, code-map, svg-canvas, flowchart, module-map, prompt-box, triage-board), frontmatter config, children nesting rules, and common compilation errors.
 ---
 
 # YAML Components Skill
@@ -299,7 +299,71 @@ edges:
 - `nodes`: Array of modules including custom styling classes.
 - `edges`: Array of directional paths mapping imports or dependencies.
 
-### 10. PromptBox (Legacy)
+### 10. CodeMap
+
+A spatial "code flow" diagram: labeled group containers and syntax-highlighted
+code cards laid out on a dotted canvas, with curved arrows connecting a
+highlighted token in one card to another card (or to a token inside it).
+Ideal for visualizing call chains across files (entry point → init → services).
+
+```yaml
+type: code-map
+title: "Startup flow"     # optional heading above the canvas
+width: 1240               # canvas width in px. Defaults to 1200.
+height: 770               # canvas height in px. Required.
+groups:
+  - label: "Entry Point"
+    variant: amber        # amber | green | blue | clay | plain (default)
+    x: 16
+    y: 10
+    width: 350
+    height: 245
+cards:
+  - id: main              # unique id, used by arrows
+    x: 32
+    y: 70
+    width: 318
+    height: 200           # optional; auto-sizes to content if omitted
+    title: "src/main.ts"  # optional file-path header
+    language: ts          # rust | ts | js | python | ... (default: generic)
+    code: |
+      main(): void {
+        try {
+          this.[[startup]]();
+        } catch (error) {
+          console.error(error.message);
+        }
+      }
+  - id: startup
+    x: 432
+    y: 110
+    width: 340
+    language: ts
+    code: |
+      private async [[startup]](): Promise<void>
+        const [services] = this.[[createServices]]();
+arrows:
+  - from: main.startup    # "cardId.anchorId" (a token) or just "cardId"
+    to: startup.startup   # same syntax; plain "cardId" targets the card edge
+```
+
+- `width` / `height`: Pixel dimensions of the canvas. All `x`/`y` coordinates
+  are absolute within it. The canvas scrolls horizontally if wider than the page.
+- `groups`: Decorative labeled containers drawn behind the cards. `variant`
+  picks the accent color of the border and label tab.
+- `cards`: Code snippet boxes. Code is syntax-highlighted automatically
+  (keywords, types, strings, numbers, function calls, comments) based on
+  `language`.
+- **Anchor tokens**: Inside `code`, wrap a token in `[[...]]` to render it as
+  a blue highlighted chip and register it as an arrow endpoint with id
+  `cardId.token`. Use `[[myId|display text]]` when the display text is not a
+  valid id or appears more than once in the card. Lines containing an anchor
+  get a highlighted background.
+- `arrows`: Curved connectors drawn at load time by inlined JS. `from`/`to`
+  accept `cardId.anchorId` (points at the token) or `cardId` (points at the
+  card's nearest edge).
+
+### 11. PromptBox (Legacy)
 
 <!-- ```yaml -->
 type: prompt-box
@@ -310,7 +374,7 @@ content: This is prompt content.
 - `label`: Header text.
 - `content`: Body text (pre-wrap, monospace).
 
-### 11. TriageBoard (Legacy)
+### 12. TriageBoard (Legacy)
 
 ```yaml
 type: triage-board

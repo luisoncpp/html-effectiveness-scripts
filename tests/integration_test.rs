@@ -289,6 +289,52 @@ fn code_panel_markdown_renders_component_and_no_raw_yaml() {
 }
 
 #[test]
+fn code_map_markdown_renders_component_and_no_raw_yaml() {
+    let input = PathBuf::from("tests/fixtures/code_map.md");
+    let output = PathBuf::from("tests/fixtures/code_map_output.html");
+
+    let args = CliArgs {
+        input,
+        output: output.clone(),
+    };
+
+    let result = compiler::run_compilation(&args);
+    assert!(result.is_ok());
+
+    let html = std::fs::read_to_string(&output).unwrap();
+    let _ = std::fs::remove_file(&output);
+
+    // Canvas, groups, cards
+    assert!(html.contains("code-map__canvas"));
+    assert!(html.contains("code-map__group--amber"));
+    assert!(html.contains("code-map__group--green"));
+    assert!(html.contains("Entry Point"));
+    assert!(html.contains("Pipeline"));
+    assert!(html.contains(r#"data-card="main""#));
+    assert!(html.contains(r#"data-card="parseArgs""#));
+
+    // Anchor tokens and arrows
+    assert!(html.contains(r#"data-anchor="main.run""#));
+    assert!(html.contains(r#"data-from="run.parseArgs""#));
+    assert!(html.contains(r#"data-to="parseArgs""#));
+    assert!(html.contains("code-map__line--hl"));
+
+    // Syntax highlighting
+    assert!(html.contains("tok-kw"));
+    assert!(html.contains("tok-ty"));
+    assert!(html.contains("tok-com"));
+
+    // Assets inlined
+    assert!(html.contains(".code-map__token"));
+    assert!(html.contains("data-code-map"));
+
+    // Anchor markers consumed, no raw YAML
+    assert!(!html.contains("[[run]]"));
+    assert!(!html.contains("type: code-map"));
+    assert!(!html.contains("arrows:"));
+}
+
+#[test]
 fn all_primitives_markdown_renders_every_component() {
     let input = PathBuf::from("tests/fixtures/all_primitives.md");
     let output = PathBuf::from("tests/fixtures/all_primitives_output.html");
@@ -355,6 +401,10 @@ fn all_primitives_markdown_renders_every_component() {
     // Triage Board
     assert!(html.contains("Cycle 15 triage"));
 
+    // Code Map
+    assert!(html.contains("code-map__canvas"));
+    assert!(html.contains(r#"data-anchor="main.run""#));
+
     // No raw YAML anywhere
     assert!(!html.contains("type: notice"));
     assert!(!html.contains("type: card"));
@@ -362,6 +412,7 @@ fn all_primitives_markdown_renders_every_component() {
     assert!(!html.contains("type: timeline"));
     assert!(!html.contains("type: board-layout"));
     assert!(!html.contains("type: code-panel"));
+    assert!(!html.contains("type: code-map"));
     assert!(!html.contains("type: svg-canvas"));
     assert!(!html.contains("type: flowchart"));
     assert!(!html.contains("type: module-map"));

@@ -68,6 +68,7 @@ The compiler produces a single `.html` file with all CSS and JavaScript inlined 
 | `timeline` | Sequential milestones or event steps |
 | `board-layout` | Kanban, grid, or slides layout |
 | `code-panel` | Tabbed code snippet display with diff support |
+| `code-map` | Spatial code-flow diagram: grouped, syntax-highlighted code cards connected by arrows |
 | `svg-canvas` | Declarative SVG wrapper |
 | `prompt-box` | Monospace content box |
 | `triage-board` | Planning board |
@@ -94,7 +95,7 @@ This project includes an OpenCode skill for AI coding assistants. To install it:
 2. The skill activates automatically when writing, editing, or debugging YAML component blocks in hybrid Markdown files.
 
 The skill provides:
-- Full syntax reference for all 11 component primitives
+- Full syntax reference for all 12 component primitives
 - Frontmatter configuration guide
 - Children nesting rules
 - Common compilation errors and their causes

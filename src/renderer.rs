@@ -47,6 +47,10 @@ impl TemplateEngine {
             include_str!("../templates/components/code_panel.html"),
         )?;
         env.add_template(
+            "code_map",
+            include_str!("../templates/components/code_map.html"),
+        )?;
+        env.add_template(
             "board_layout",
             include_str!("../templates/components/board_layout.html"),
         )?;

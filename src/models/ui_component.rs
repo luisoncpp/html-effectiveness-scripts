@@ -4,6 +4,7 @@ use super::base::Renderable;
 use super::block::Block;
 use super::components::board_layout::BoardLayoutData;
 use super::components::card::CardData;
+use super::components::code_map::CodeMapData;
 use super::components::code_panel::CodePanelData;
 use super::components::data_grid::DataGridData;
 use super::components::flowchart::FlowchartData;
@@ -33,6 +34,8 @@ pub enum UiComponent {
     Timeline(TimelineData),
     #[serde(rename = "code-panel")]
     CodePanel(CodePanelData),
+    #[serde(rename = "code-map")]
+    CodeMap(CodeMapData),
     #[serde(rename = "board-layout")]
     BoardLayout(BoardLayoutData),
     #[serde(rename = "triage-board")]
@@ -59,6 +62,7 @@ impl UiComponent {
             UiComponent::DataGrid(data) => data,
             UiComponent::Timeline(data) => data,
             UiComponent::CodePanel(data) => data,
+            UiComponent::CodeMap(data) => data,
             UiComponent::BoardLayout(data) => data,
             UiComponent::TriageBoard(data) => data,
             UiComponent::Flowchart(data) => data,
