@@ -2,6 +2,7 @@ use minijinja::Value;
 
 pub mod board_layout;
 pub mod card;
+pub mod code_map;
 pub mod code_panel;
 pub mod data_grid;
 pub mod flowchart;

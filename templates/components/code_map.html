@@ -1,0 +1,35 @@
+<div class="code-map">
+  {% if title %}<h2 class="code-map__title">{{ title|safe }}</h2>{% endif %}
+  <div class="code-map__viewport">
+    <div class="code-map__canvas" data-code-map style="width: {{ width }}px; height: {{ height }}px;">
+      {% for group in groups %}
+      <div class="code-map__group code-map__group--{{ group.variant }}"
+           style="left: {{ group.x }}px; top: {{ group.y }}px; width: {{ group.width }}px; height: {{ group.height }}px;">
+        <span class="code-map__group-label">{{ group.label|safe }}</span>
+      </div>
+      {% endfor %}
+
+      {% for card in cards %}
+      <div class="code-map__card" data-card="{{ card.id }}"
+           style="left: {{ card.x }}px; top: {{ card.y }}px; width: {{ card.width }}px;{% if card.height %} height: {{ card.height }}px;{% endif %}">
+        {% if card.title %}<div class="code-map__card-title">{{ card.title|safe }}</div>{% endif %}
+        <pre class="code-map__code">{% for line in card.lines %}<div class="code-map__line{% if line.hl %} code-map__line--hl{% endif %}">{{ line.html|safe }}</div>{% endfor %}</pre>
+      </div>
+      {% endfor %}
+
+      <svg class="code-map__arrows" width="{{ width }}" height="{{ height }}">
+        <defs>
+          <marker id="cm-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="code-map__arrow-head"/>
+          </marker>
+        </defs>
+        {% for arrow in arrows %}
+        <path class="code-map__arrow" data-from="{{ arrow.from }}" data-to="{{ arrow.to }}" marker-end="url(#cm-arrow)"/>
+        {% endfor %}
+      </svg>
+    </div>
+  </div>
+</div>
+{% if children %}
+<div class="code-map__children">{{ children }}</div>
+{% endif %}
