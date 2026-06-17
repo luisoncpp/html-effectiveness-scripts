@@ -44,23 +44,38 @@ separate text contexts in a document:
 - **Document prose** — any text *outside* a fenced `yaml` block. This is parsed
   as standard Markdown (via pulldown-cmark). Use `*emphasis*`, `**bold**`,
   `# headings`, `- lists`, `[links](url)`, tables, etc. as normal.
-- **Component fields** — text fields *inside* a YAML component block. Almost all
-  of these are emitted verbatim into the template with the `|safe` filter, i.e.
-  treated as **raw HTML** with no Markdown processing. The two exceptions are
-  `notice.content` and `card.content` (see below).
+- **Component fields** — text fields *inside* a YAML component block. Most prose
+  and label fields are run through the Markdown renderer (see the table below);
+  the result is still emitted with `|safe`, so inline HTML works in those fields
+  too. A handful of fields remain **raw HTML / plain text** with no Markdown
+  processing — chiefly SVG `<text>` content (where HTML tags wouldn't render) and
+  literal code blocks.
 
-**Consequence:** inside a raw-HTML field, Markdown syntax does *not* work.
+**Consequence:** inside a raw-HTML-only field, Markdown syntax does *not* work.
 Writing `*important*` renders the literal asterisks; you must write
-`<em>important</em>`. Likewise use `<strong>`, `<code>`, `<a href="...">`,
-`<br>`, `<ul><li>…`, etc.
+`<em>important</em>`.
 
-### The two Markdown-aware fields
+### Markdown-aware fields
 
-Only **`notice.content`** and **`card.content`** are run through the Markdown
-renderer before output (`render_markdown` in `src/models/components/mod.rs`).
-There you can use full Markdown — `**bold**`, `*italics*`, lists, links, even
-headings (note: block-level Markdown wraps text in `<p>`). HTML still works there
-too, since the result is emitted with `|safe`.
+Two helpers in `src/models/components/mod.rs` do the work:
+
+- `render_markdown` — full **block** Markdown (paragraphs, lists, headings; wraps
+  in `<p>`). Used for multi-line content areas.
+- `render_markdown_inline` — **inline** Markdown (`**bold**`, `*em*`, `` `code` ``,
+  `[links](url)`) with the lone wrapping `<p>` stripped. Used for titles, table
+  cells, list items, and other single-line fields. Content with multiple
+  paragraphs falls back to the full block render.
+
+| Component | Block-Markdown fields | Inline-Markdown fields |
+|-----------|----------------------|------------------------|
+| Notice | `content` | — |
+| Card | `content` | `title` |
+| DataGrid | — | `columns[]`, `rows[][]` (cells) |
+| Timeline | — | `steps[].title`, `steps[].description` |
+| BoardLayout | — | `columns[].title`, `columns[].items[]` |
+| Flowchart | — | `title`, `description`, `details[].title`/`meta`/`body` |
+| ModuleMap | — | `title` |
+| TriageBoard | — | `title`, `subtitle`, `hintline` |
 
 ```yaml
 type: notice
@@ -69,24 +84,25 @@ content: |
   **Markdown works here** — and so does <strong>inline HTML</strong>.
 ```
 
-### Every other field requires HTML (no Markdown)
+Note: because cells/titles now go through the Markdown renderer, bare `&`, `<`,
+`>` are HTML-escaped (e.g. `Drag & Drop` → `Drag &amp; Drop`). Write real entities
+or HTML if you need literal markup.
 
-These fields are raw HTML / plain text — `*foo*` will render literally. Use HTML
-tags for any inline formatting:
+### Fields that are NOT Markdown (raw text / HTML)
 
-| Component | HTML-only fields |
-|-----------|------------------|
-| Card | `title` (note: `content` *is* Markdown — see above) |
-| DataGrid | `columns[]`, `rows[][]` (cells) |
-| Timeline | `steps[].title`, `steps[].description` |
-| BoardLayout | `columns[].items[]` |
-| SvgCanvas | `elements[].text` |
-| Flowchart | `title`, `description`, node `label`/`sublabel`, edge `label`, `details[].title`/`meta`/`body` |
-| ModuleMap | `title`, node `label`, edge `label` |
-| TriageBoard | `eyebrow`, `title`, `subtitle`, `hintline` |
-| PromptBox | `label`, `content` (pre-wrap monospace text) |
+These are emitted without Markdown processing — `*foo*` renders literally:
 
-A third case is **literal code/`<pre>` fields** — neither Markdown nor
+| Component | Raw fields | Why |
+|-----------|------------|-----|
+| Card | `tags[]` | short chip labels |
+| Timeline | `steps[].timestamp`, `steps[].tags[]` | date / chip labels |
+| TriageBoard | `eyebrow` | breadcrumb label |
+| SvgCanvas | `elements[].text` | SVG `<text>` — HTML wouldn't render |
+| Flowchart | node `label`/`sublabel`, edge `label` | SVG `<text>` |
+| ModuleMap | node `label`, edge `label` | SVG `<text>` |
+| PromptBox | `label`, `content` | pre-wrap monospace, shown verbatim |
+
+A further case is **literal code/`<pre>` fields** — neither Markdown nor
 interpreted HTML; the text appears exactly as written:
 `code-panel.tabs[].content`, `flowchart.details[].code`, and `code-map.cards[].code`
 (the last is additionally syntax-highlighted by language).
@@ -107,7 +123,7 @@ content: |
 
 - `variant`: CSS modifier class. Determines border/color accent.
 - `icon`: Optional string. Rendered as text if present.
-- `content`: HTML string rendered with `|safe`. Use inline tags for formatting.
+- `content`: block Markdown (and inline HTML). Use `**bold**`, lists, etc.
 
 ### 2. Card
 
@@ -128,10 +144,10 @@ children:
     content: Nested callout inside the card.
 ```
 
-- `title`: Optional header.
+- `title`: Optional header. Inline Markdown (`**bold**`, `` `code` ``).
 - `elevation`: Visual depth (box shadow). Defaults to `1`.
-- `tags`: Optional list of strings rendered as small chips.
-- `content`: HTML string rendered with `|safe` inside the card body.
+- `tags`: Optional list of strings rendered as small chips (plain text).
+- `content`: block Markdown (and inline HTML) inside the card body.
 - `children`: Optional array of nested component blocks.
 
 ### 3. DataGrid
@@ -149,8 +165,8 @@ rows:
   - ["Drag & Drop", "WIP", "High"]
 ```
 
-- `columns`: Array of header strings.
-- `rows`: Array of arrays. Each inner array is a row. Cell values are rendered with `|safe`, so you can inline HTML badges if needed.
+- `columns`: Array of header strings. Inline Markdown supported.
+- `rows`: Array of arrays. Each inner array is a row. Cell values support inline Markdown (`**bold**`, `` `code` ``, links) and inline HTML badges. Bare `&`/`<`/`>` are HTML-escaped.
 
 ### 4. Timeline
 

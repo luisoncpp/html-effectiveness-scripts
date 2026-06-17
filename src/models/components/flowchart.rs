@@ -56,14 +56,32 @@ impl ComponentStrategy for FlowchartData {
     }
 
     fn render_context(&self, children_html: &str) -> Value {
+        let details: Vec<FlowchartDetailView> = self
+            .details
+            .iter()
+            .map(|d| FlowchartDetailView {
+                title: super::render_markdown_inline(&d.title),
+                meta: super::render_markdown_inline(&d.meta),
+                body: super::render_markdown_inline(&d.body),
+                code: d.code.as_deref(),
+            })
+            .collect();
         context! {
-            title => &self.title,
-            description => &self.description,
+            title => super::render_markdown_inline(&self.title),
+            description => self.description.as_deref().map(super::render_markdown_inline),
             view_box => &self.view_box,
             nodes => &self.nodes,
             edges => &self.edges,
-            details => &self.details,
+            details => details,
             children => children_html,
         }
     }
+}
+
+#[derive(Serialize)]
+struct FlowchartDetailView<'a> {
+    title: String,
+    meta: String,
+    body: String,
+    code: Option<&'a str>,
 }

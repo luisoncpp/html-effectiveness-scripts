@@ -2,7 +2,7 @@
     {% for column in columns %}
     <div class="board-column">
         <div class="board-column__header">
-            <div class="board-column__title">{{ column.title }}</div>
+            <div class="board-column__title">{{ column.title|safe }}</div>
             <span class="board-column__count">{{ column.items|length }}</span>
         </div>
         <div class="board-column__body">

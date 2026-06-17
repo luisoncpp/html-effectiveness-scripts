@@ -164,7 +164,7 @@ fn data_grid_markdown_renders_component_and_no_raw_yaml() {
     assert!(html.contains("<td>AST Traversal</td>"));
     assert!(html.contains("<td>Shipped</td>"));
     assert!(html.contains("<td>Low</td>"));
-    assert!(html.contains("<td>Drag & Drop</td>"));
+    assert!(html.contains("<td>Drag &amp; Drop</td>"));
     assert!(html.contains("<td>WIP</td>"));
     assert!(html.contains("<td>High</td>"));
     assert!(html.contains("<td>Minijinja Templating</td>"));
@@ -382,7 +382,7 @@ fn all_primitives_markdown_renders_every_component() {
 
     // Timeline
     assert!(html.contains("timeline--vertical"));
-    assert!(html.contains("Schema & API contract"));
+    assert!(html.contains("Schema &amp; API contract"));
     assert!(html.contains("Ship to beta"));
 
     // Board Layout
@@ -454,5 +454,21 @@ fn component_markdown_rendering_regression_test() {
 
     // Verify notice markdown bold formatting
     assert!(html.contains("This is notice text with <strong>bold formatting</strong>."));
+
+    // Card title renders inline markdown (no wrapping <p>)
+    assert!(html.contains(r#"<div class="card__title">Card with <code>code</code> title</div>"#));
+
+    // Data grid headers and cells render inline markdown; & is escaped
+    assert!(html.contains("<th><strong>Feature</strong></th>"));
+    assert!(html.contains("<td><code>AST</code></td>"));
+    assert!(html.contains("<td>Shipped &amp; live</td>"));
+
+    // Board column titles and items render inline markdown
+    assert!(html.contains(r#"<div class="board-column__title"><strong>Now</strong></div>"#));
+    assert!(html.contains(r#"<div class="board-item">Ship <code>parser</code></div>"#));
+
+    // Timeline title and description render inline markdown
+    assert!(html.contains("<h3>Build <strong>parser</strong></h3>"));
+    assert!(html.contains("Wire up the <code>AST</code> walker."));
 }
 

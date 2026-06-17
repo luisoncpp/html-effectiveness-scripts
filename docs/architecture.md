@@ -209,6 +209,38 @@ The output HTML is fully self-contained. Templates live in `templates/` and are 
   * `flowchart.js` — Flowchart detail expansion.
 * All JS is emitted in a single inline `<script>` tag, with no external dependencies.
 
+### Markdown rendering in component fields
+
+Two helpers in `models/components/mod.rs` convert Markdown to HTML before context
+construction; both emit through the `|safe` filter, so inline HTML still works in
+any Markdown-aware field:
+
+* **`render_markdown`** — block-level Markdown (paragraphs, lists, headings; wraps
+  text in `<p>`). Used for multi-paragraph content areas.
+* **`render_markdown_inline`** — inline Markdown (`**bold**`, `*em*`, `` `code` ``,
+  links) with a lone wrapping `<p>` stripped, for single-line fields. Falls back to
+  the block render when the input spans multiple paragraphs.
+
+| Field(s) | Renderer |
+|----------|----------|
+| `notice.content`, `card.content` | `render_markdown` (block) |
+| `card.title` | `render_markdown_inline` |
+| `data-grid.columns[]`, `data-grid.rows[][]` | `render_markdown_inline` |
+| `timeline.steps[].title`, `timeline.steps[].description` | `render_markdown_inline` |
+| `board-layout.columns[].title`, `board-layout.columns[].items[]` | `render_markdown_inline` |
+| `flowchart.title`/`description`, `flowchart.details[].title`/`meta`/`body` | `render_markdown_inline` |
+| `module-map.title` | `render_markdown_inline` |
+| `triage-board.title`/`subtitle`/`hintline` | `render_markdown_inline` |
+
+Fields **not** Markdown-processed (emitted as raw text/HTML): code/`<pre>` content
+(`code-panel.tabs[].content`, `flowchart.details[].code`, `code-map.cards[].code`);
+SVG `<text>` content (`svg-canvas.elements[].text`, flowchart/module-map node &
+edge labels) where HTML would not render; short labels (`card.tags`,
+`timeline.steps[].timestamp`/`tags`, `triage-board.eyebrow`); and `prompt-box`
+(`label`, `content`, shown verbatim as monospace). Because Markdown-aware fields go
+through the renderer, bare `&`/`<`/`>` are HTML-escaped (e.g. `Drag & Drop` →
+`Drag &amp; Drop`).
+
 ## 6. Component Strategy Pattern
 
 Each component is a self-contained strategy module. `UiComponent` is a thin enum that delegates all behavior to the `ComponentStrategy` trait.

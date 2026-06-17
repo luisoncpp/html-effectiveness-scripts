@@ -19,9 +19,19 @@ impl ComponentStrategy for DataGridData {
     }
 
     fn render_context(&self, children_html: &str) -> Value {
+        let columns: Vec<String> = self
+            .columns
+            .iter()
+            .map(|c| super::render_markdown_inline(c))
+            .collect();
+        let rows: Vec<Vec<String>> = self
+            .rows
+            .iter()
+            .map(|row| row.iter().map(|c| super::render_markdown_inline(c)).collect())
+            .collect();
         context! {
-            columns => &self.columns,
-            rows => &self.rows,
+            columns => columns,
+            rows => rows,
             children => children_html,
         }
     }

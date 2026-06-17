@@ -42,7 +42,7 @@ impl ComponentStrategy for ModuleMapData {
 
     fn render_context(&self, children_html: &str) -> Value {
         context! {
-            title => &self.title,
+            title => super::render_markdown_inline(&self.title),
             view_box => &self.view_box,
             nodes => &self.nodes,
             edges => &self.edges,

@@ -34,10 +34,31 @@ impl ComponentStrategy for TimelineData {
     }
 
     fn render_context(&self, children_html: &str) -> Value {
+        let steps: Vec<TimelineStepView> = self
+            .steps
+            .iter()
+            .map(|step| TimelineStepView {
+                timestamp: &step.timestamp,
+                title: super::render_markdown_inline(&step.title),
+                step_type: &step.step_type,
+                description: step.description.as_deref().map(super::render_markdown_inline),
+                tags: step.tags.as_deref(),
+            })
+            .collect();
         context! {
             orientation => &self.orientation,
-            steps => &self.steps,
+            steps => steps,
             children => children_html,
         }
     }
+}
+
+#[derive(Serialize)]
+struct TimelineStepView<'a> {
+    timestamp: &'a str,
+    title: String,
+    #[serde(rename = "type")]
+    step_type: &'a str,
+    description: Option<String>,
+    tags: Option<&'a [String]>,
 }

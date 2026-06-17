@@ -23,9 +23,9 @@ impl ComponentStrategy for TriageBoardData {
     fn render_context(&self, children_html: &str) -> Value {
         context! {
             eyebrow => &self.eyebrow,
-            title => &self.title,
-            subtitle => &self.subtitle,
-            hintline => &self.hintline,
+            title => super::render_markdown_inline(&self.title),
+            subtitle => super::render_markdown_inline(&self.subtitle),
+            hintline => super::render_markdown_inline(&self.hintline),
             children => children_html,
         }
     }

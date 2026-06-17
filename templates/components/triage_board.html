@@ -1,9 +1,9 @@
 <div class="wrap">
   <header>
     <div class="eyebrow">{{ eyebrow }}</div>
-    <h1>{{ title }}</h1>
-    <p class="sub">{{ subtitle }}</p>
-    <div class="hintline">{{ hintline }}</div>
+    <h1>{{ title|safe }}</h1>
+    <p class="sub">{{ subtitle|safe }}</p>
+    <div class="hintline">{{ hintline|safe }}</div>
   </header>
 
   <div class="toolbar">

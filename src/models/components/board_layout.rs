@@ -31,10 +31,28 @@ impl ComponentStrategy for BoardLayoutData {
     }
 
     fn render_context(&self, children_html: &str) -> Value {
+        let columns: Vec<BoardColumnView> = self
+            .columns
+            .iter()
+            .map(|col| BoardColumnView {
+                title: super::render_markdown_inline(&col.title),
+                items: col
+                    .items
+                    .iter()
+                    .map(|item| super::render_markdown_inline(item))
+                    .collect(),
+            })
+            .collect();
         context! {
             variant => &self.variant,
-            columns => &self.columns,
+            columns => columns,
             children => children_html,
         }
     }
+}
+
+#[derive(Serialize)]
+struct BoardColumnView {
+    title: String,
+    items: Vec<String>,
 }
