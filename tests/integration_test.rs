@@ -284,6 +284,12 @@ fn code_panel_markdown_renders_component_and_no_raw_yaml() {
     assert!(html.contains("parse_single"));
     assert!(html.contains("parse_blocks"));
     assert!(html.contains("pulldown-cmark"));
+
+    // Generic arguments that look like HTML tags are written plainly in the
+    // YAML and must be escaped, not interpreted as markup.
+    assert!(html.contains("List&lt;Dictionary&lt;string, int&gt;&gt;"));
+    assert!(!html.contains("<Dictionary<string, int>>"));
+
     assert!(!html.contains("type: code-panel"));
     assert!(!html.contains("tabs:"));
 }
@@ -327,6 +333,10 @@ fn code_map_markdown_renders_component_and_no_raw_yaml() {
     // Assets inlined
     assert!(html.contains(".code-map__token"));
     assert!(html.contains("data-code-map"));
+
+    // Generic return types (e.g. Promise<void>) are escaped, not treated as tags
+    assert!(html.contains(r#"&lt;<span class="tok-kw">void</span>&gt;"#));
+    assert!(!html.contains("Promise<void>"));
 
     // Anchor markers consumed, no raw YAML
     assert!(!html.contains("[[run]]"));

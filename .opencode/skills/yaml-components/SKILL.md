@@ -36,6 +36,61 @@ theme: clay-slate   # loads assets/tokens/<theme>.css
 - `layout`: `reading-column` (default, 65ch max), `wide`, or `canvas`.
 - `theme`: Optional. Activates a theme token CSS file.
 
+## Markdown vs. HTML: where each is allowed
+
+This is the single most common source of confusion. There are two completely
+separate text contexts in a document:
+
+- **Document prose** — any text *outside* a fenced `yaml` block. This is parsed
+  as standard Markdown (via pulldown-cmark). Use `*emphasis*`, `**bold**`,
+  `# headings`, `- lists`, `[links](url)`, tables, etc. as normal.
+- **Component fields** — text fields *inside* a YAML component block. Almost all
+  of these are emitted verbatim into the template with the `|safe` filter, i.e.
+  treated as **raw HTML** with no Markdown processing. The two exceptions are
+  `notice.content` and `card.content` (see below).
+
+**Consequence:** inside a raw-HTML field, Markdown syntax does *not* work.
+Writing `*important*` renders the literal asterisks; you must write
+`<em>important</em>`. Likewise use `<strong>`, `<code>`, `<a href="...">`,
+`<br>`, `<ul><li>…`, etc.
+
+### The two Markdown-aware fields
+
+Only **`notice.content`** and **`card.content`** are run through the Markdown
+renderer before output (`render_markdown` in `src/models/components/mod.rs`).
+There you can use full Markdown — `**bold**`, `*italics*`, lists, links, even
+headings (note: block-level Markdown wraps text in `<p>`). HTML still works there
+too, since the result is emitted with `|safe`.
+
+```yaml
+type: notice
+variant: warning
+content: |
+  **Markdown works here** — and so does <strong>inline HTML</strong>.
+```
+
+### Every other field requires HTML (no Markdown)
+
+These fields are raw HTML / plain text — `*foo*` will render literally. Use HTML
+tags for any inline formatting:
+
+| Component | HTML-only fields |
+|-----------|------------------|
+| Card | `title` (note: `content` *is* Markdown — see above) |
+| DataGrid | `columns[]`, `rows[][]` (cells) |
+| Timeline | `steps[].title`, `steps[].description` |
+| BoardLayout | `columns[].items[]` |
+| SvgCanvas | `elements[].text` |
+| Flowchart | `title`, `description`, node `label`/`sublabel`, edge `label`, `details[].title`/`meta`/`body` |
+| ModuleMap | `title`, node `label`, edge `label` |
+| TriageBoard | `eyebrow`, `title`, `subtitle`, `hintline` |
+| PromptBox | `label`, `content` (pre-wrap monospace text) |
+
+A third case is **literal code/`<pre>` fields** — neither Markdown nor
+interpreted HTML; the text appears exactly as written:
+`code-panel.tabs[].content`, `flowchart.details[].code`, and `code-map.cards[].code`
+(the last is additionally syntax-highlighted by language).
+
 ## Available Primitives
 
 ### 1. Notice
@@ -418,6 +473,7 @@ The parser:
 | `Unsupported child block type` | A child in `children` lacks a `type` key. |
 | Missing styles in output | Component CSS not registered in `assets.rs` `resolve_asset()`. |
 | Render error comment in HTML | Template name mismatch or missing template registration in `renderer.rs`. |
-| Code not being rendered and unexpected formatting change | Using `<` `>` characters in content without escaping them (use either `&lt;` `&gt;` or backquotes) |
 
 The compiler produces a fully self-contained HTML file with zero external asset links.
+
+Unless you are asked otherwise, save the file with the `.yaml.md` extension to indicate it contains YAML component blocks.

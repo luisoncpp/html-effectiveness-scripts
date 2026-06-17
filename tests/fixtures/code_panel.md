@@ -16,6 +16,12 @@ tabs:
     content: |
       [dependencies]
       pulldown-cmark = "0.9"
+  - name: "Repo.cs"
+    language: csharp
+    content: |
+      public List<Dictionary<string, int>> Load() {
+          return new List<Dictionary<string, int>>();
+      }
 ```
 
 Some trailing paragraph.

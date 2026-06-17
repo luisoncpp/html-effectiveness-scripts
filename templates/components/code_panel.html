@@ -29,25 +29,25 @@
                     <div class="diff-row add">
                         <span class="ln">{{ loop.index }}</span>
                         <span class="mark">+</span>
-                        <span class="code">{{ line[1:] }}</span>
+                        <span class="code">{{ line[1:]|escape }}</span>
                     </div>
                     {% elif line is startingwith('-') %}
                     <div class="diff-row del">
                         <span class="ln">{{ loop.index }}</span>
                         <span class="mark">-</span>
-                        <span class="code">{{ line[1:] }}</span>
+                        <span class="code">{{ line[1:]|escape }}</span>
                     </div>
                     {% else %}
                     <div class="diff-row ctx">
                         <span class="ln">{{ loop.index }}</span>
                         <span class="mark"> </span>
-                        <span class="code">{{ line }}</span>
+                        <span class="code">{{ line|escape }}</span>
                     </div>
                     {% endif %}
                     {% endfor %}
                 </div>
                 {% else %}
-                <pre><code class="language-{{ tab.language }}">{{ tab.content }}</code></pre>
+                <pre><code class="language-{{ tab.language }}">{{ tab.content|escape }}</code></pre>
                 {% endif %}
             </article>
         </div>

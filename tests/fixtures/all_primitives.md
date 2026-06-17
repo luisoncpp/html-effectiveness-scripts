@@ -15,7 +15,7 @@ type: notice
 variant: warning
 icon: alert-triangle
 content: |
-  <strong>Breaking Change:</strong> The parser now expects multiple blocks.
+  <strong>Breaking Change:</strong> The parser now expects multiple blocks. **A**
 ```
 
 ## Card
@@ -28,7 +28,7 @@ tags:
   - rust
   - urgent
 content: |
-  This card demonstrates tags, elevation, and content.
+  This card demonstrates tags, elevation, and content.**A**
 children:
   - type: notice
     variant: info
