@@ -1,5 +1,5 @@
-use html_effectiveness::cli::CliArgs;
-use html_effectiveness::compiler;
+use mdyaml2html::cli::CliArgs;
+use mdyaml2html::compiler;
 
 use std::path::PathBuf;
 

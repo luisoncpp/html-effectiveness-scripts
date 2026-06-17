@@ -1,4 +1,4 @@
-# html-effectiveness
+# mdyaml2html
 
 A Rust CLI compiler that transforms hybrid Markdown files (prose + fenced YAML component blocks) into self-contained, styled HTML files.
 
@@ -12,14 +12,14 @@ Requires [Rust](https://rustup.rs). Clone the repo and build:
 cargo build --release
 ```
 
-The binary will be at `target/release/html-effectiveness`.
+The binary will be at `target/release/mdyaml2html`.
 
 ## Usage
 
 ```sh
-html-effectiveness --input <INPUT.md> --output <OUTPUT.html>
+mdyaml2html --input <INPUT.md> --output <OUTPUT.html>
 # or short form:
-html-effectiveness -i <INPUT.md> -o <OUTPUT.html>
+mdyaml2html -i <INPUT.md> -o <OUTPUT.html>
 ```
 
 ### Input format
