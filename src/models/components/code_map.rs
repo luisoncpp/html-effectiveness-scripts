@@ -114,7 +114,10 @@ fn render_line(line: &str, lang: &str, card_id: &str) -> (String, bool) {
 
 impl ComponentStrategy for CodeMapData {
     fn required_assets(&self) -> (Vec<&'static str>, Vec<&'static str>) {
-        (vec!["css/code_map.css"], vec!["js/code_map.js"])
+        (
+            vec!["css/syntax.css", "css/code_map.css"],
+            vec!["js/code_map.js"],
+        )
     }
 
     fn template_name(&self) -> &'static str {

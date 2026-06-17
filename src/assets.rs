@@ -101,6 +101,7 @@ fn resolve_asset(path: &str) -> Option<&'static str> {
         "css/timeline.css" => Some(include_str!("../assets/css/timeline.css")),
         "css/code_panel.css" => Some(include_str!("../assets/css/code_panel.css")),
         "css/code_map.css" => Some(include_str!("../assets/css/code_map.css")),
+        "css/syntax.css" => Some(include_str!("../assets/css/syntax.css")),
         "js/code_map.js" => Some(include_str!("../assets/js/code_map.js")),
         "js/tabs.js" => Some(include_str!("../assets/js/tabs.js")),
         "css/board_layout.css" => Some(include_str!("../assets/css/board_layout.css")),

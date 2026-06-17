@@ -276,7 +276,7 @@ tabs:
             }],
         });
         let (css, js) = comp.required_assets();
-        assert_eq!(css, vec!["css/code_panel.css"]);
+        assert_eq!(css, vec!["css/syntax.css", "css/code_panel.css"]);
         assert_eq!(js, vec!["js/tabs.js"]);
     }
 

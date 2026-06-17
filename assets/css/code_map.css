@@ -143,14 +143,7 @@
     font-weight: 500;
 }
 
-/* ---- syntax tokens (muted, palette-aligned) ---- */
-
-.code-map .tok-kw  { color: var(--rust); }
-.code-map .tok-fn  { color: var(--clay-d); }
-.code-map .tok-ty  { color: #9A7B2E; }
-.code-map .tok-str { color: var(--olive); }
-.code-map .tok-num { color: var(--clay); }
-.code-map .tok-com { color: var(--gray-500); font-style: italic; }
+/* Syntax token colors live in css/syntax.css (shared with code_panel). */
 
 /* ---- arrows ---- */
 
@@ -203,8 +196,4 @@ html[data-theme="dark"] .code-map__group--clay .code-map__group-label {
     color: #161615;
 }
 
-html[data-theme="dark"] .code-map .tok-kw  { color: #D98A80; }
-html[data-theme="dark"] .code-map .tok-fn  { color: var(--clay-d); }
-html[data-theme="dark"] .code-map .tok-ty  { color: #C9A95E; }
-html[data-theme="dark"] .code-map .tok-str { color: #9FB382; }
-html[data-theme="dark"] .code-map .tok-num { color: var(--clay); }
+/* Dark-mode token colors live in css/syntax.css (shared with code_panel). */

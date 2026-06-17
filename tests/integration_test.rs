@@ -286,8 +286,11 @@ fn code_panel_markdown_renders_component_and_no_raw_yaml() {
     assert!(html.contains("pulldown-cmark"));
 
     // Generic arguments that look like HTML tags are written plainly in the
-    // YAML and must be escaped, not interpreted as markup.
-    assert!(html.contains("List&lt;Dictionary&lt;string, int&gt;&gt;"));
+    // YAML and must be escaped, not interpreted as markup. Type names are
+    // wrapped in syntax-highlight spans, so the angle brackets remain escaped
+    // but are no longer contiguous with the identifiers around them.
+    assert!(html.contains("&lt;") && html.contains("&gt;"));
+    assert!(html.contains("<span class=\"tok-ty\">Dictionary</span>"));
     assert!(!html.contains("<Dictionary<string, int>>"));
 
     assert!(!html.contains("type: code-panel"));

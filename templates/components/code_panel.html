@@ -23,31 +23,16 @@
                 </div>
                 {% if tab.diff %}
                 <div class="diff">
-                    {% set lines = tab.content|split('\n') %}
-                    {% for line in lines %}
-                    {% if line is startingwith('+') %}
-                    <div class="diff-row add">
+                    {% for line in tab.diff_lines %}
+                    <div class="diff-row {{ line.kind }}">
                         <span class="ln">{{ loop.index }}</span>
-                        <span class="mark">+</span>
-                        <span class="code">{{ line[1:]|escape }}</span>
+                        <span class="mark">{{ line.mark }}</span>
+                        <span class="code">{{ line.html|safe }}</span>
                     </div>
-                    {% elif line is startingwith('-') %}
-                    <div class="diff-row del">
-                        <span class="ln">{{ loop.index }}</span>
-                        <span class="mark">-</span>
-                        <span class="code">{{ line[1:]|escape }}</span>
-                    </div>
-                    {% else %}
-                    <div class="diff-row ctx">
-                        <span class="ln">{{ loop.index }}</span>
-                        <span class="mark"> </span>
-                        <span class="code">{{ line|escape }}</span>
-                    </div>
-                    {% endif %}
                     {% endfor %}
                 </div>
                 {% else %}
-                <pre><code class="language-{{ tab.language }}">{{ tab.content|escape }}</code></pre>
+                <pre><code class="language-{{ tab.language }}">{{ tab.code_html|safe }}</code></pre>
                 {% endif %}
             </article>
         </div>
