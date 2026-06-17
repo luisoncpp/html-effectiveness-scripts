@@ -4,19 +4,22 @@
 
 .code-map__title {
     margin-top: 0;
+    font-family: var(--serif);
+    font-weight: 500;
+    color: var(--slate);
 }
 
 .code-map__viewport {
     overflow-x: auto;
+    border: 1.5px solid var(--gray-300);
     border-radius: 14px;
+    background: var(--ivory);
+    padding: 28px;
 }
 
 .code-map__canvas {
     position: relative;
-    background-color: var(--ivory);
-    background-image: radial-gradient(circle, var(--gray-200) 1px, transparent 1px);
-    background-size: 22px 22px;
-    border-radius: 14px;
+    background: transparent;
 }
 
 /* ---- groups ---- */
@@ -24,63 +27,64 @@
 .code-map__group {
     position: absolute;
     border: 1.5px solid var(--gray-300);
-    border-radius: 10px;
+    border-radius: 12px;
     background: transparent;
 }
 
 .code-map__group-label {
     position: absolute;
-    top: -1.5px;
-    left: -1.5px;
-    padding: 4px 16px 5px;
-    border-radius: 9px 0 10px 0;
+    top: -1px;
+    left: -1px;
+    padding: 4px 14px 5px;
+    border-radius: 11px 0 12px 0;
     background: var(--gray-700);
     color: var(--ivory);
-    font-family: var(--sans);
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
     white-space: nowrap;
 }
 
 .code-map__group--amber {
-    border-color: #B0922B;
-    background: rgba(176, 146, 43, 0.05);
+    border-color: #9A7B2E;
+    background: rgba(154, 123, 46, 0.05);
 }
 
 .code-map__group--amber .code-map__group-label {
-    background: #B0922B;
-    color: #FFFDF2;
+    background: #9A7B2E;
+    color: var(--ivory);
 }
 
 .code-map__group--green {
-    border-color: #3E9457;
-    background: rgba(62, 148, 87, 0.04);
+    border-color: var(--olive);
+    background: rgba(120, 140, 93, 0.06);
 }
 
 .code-map__group--green .code-map__group-label {
-    background: #3E9457;
-    color: #F2FFF6;
+    background: var(--olive);
+    color: var(--ivory);
 }
 
 .code-map__group--blue {
-    border-color: #3B6FD4;
-    background: rgba(59, 111, 212, 0.04);
+    border-color: #5B6B8C;
+    background: rgba(91, 107, 140, 0.05);
 }
 
 .code-map__group--blue .code-map__group-label {
-    background: #3B6FD4;
-    color: #F4F8FF;
+    background: #5B6B8C;
+    color: var(--ivory);
 }
 
 .code-map__group--clay {
     border-color: var(--clay);
-    background: rgba(217, 119, 87, 0.05);
+    background: rgba(217, 119, 87, 0.06);
 }
 
 .code-map__group--clay .code-map__group-label {
     background: var(--clay);
-    color: #FFF6F1;
+    color: var(--ivory);
 }
 
 /* ---- code cards ---- */
@@ -88,17 +92,20 @@
 .code-map__card {
     position: absolute;
     background: var(--white);
-    border: 1px solid var(--gray-200);
+    border: 1.5px solid var(--gray-300);
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(20, 20, 19, 0.06);
+    box-shadow: 0 1px 2px rgba(20, 20, 19, 0.04), 0 6px 16px rgba(20, 20, 19, 0.05);
     overflow: hidden;
 }
 
 .code-map__card-title {
-    padding: 6px 12px;
+    padding: 7px 14px;
     border-bottom: 1px solid var(--gray-150);
+    background: var(--gray-50);
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--gray-500);
     white-space: nowrap;
     overflow: hidden;
@@ -124,25 +131,26 @@
 }
 
 .code-map__line--hl {
-    background: var(--gray-50);
+    background: rgba(217, 119, 87, 0.07);
+    box-shadow: inset 2px 0 0 var(--clay);
 }
 
 .code-map__token {
-    background: #3B6FD4;
-    color: #FFFFFF;
+    background: rgba(217, 119, 87, 0.14);
+    color: var(--clay-d);
     border-radius: 4px;
     padding: 1px 5px;
     font-weight: 500;
 }
 
-/* ---- syntax tokens ---- */
+/* ---- syntax tokens (muted, palette-aligned) ---- */
 
-.code-map .tok-kw  { color: #2257D0; }
-.code-map .tok-fn  { color: #8A3FB8; }
-.code-map .tok-ty  { color: #B07215; }
-.code-map .tok-str { color: #2E7D46; }
-.code-map .tok-num { color: var(--rust); }
-.code-map .tok-com { color: var(--gray-500); }
+.code-map .tok-kw  { color: var(--rust); }
+.code-map .tok-fn  { color: var(--clay-d); }
+.code-map .tok-ty  { color: #9A7B2E; }
+.code-map .tok-str { color: var(--olive); }
+.code-map .tok-num { color: var(--clay); }
+.code-map .tok-com { color: var(--gray-500); font-style: italic; }
 
 /* ---- arrows ---- */
 
@@ -156,36 +164,47 @@
 
 .code-map__arrow {
     fill: none;
-    stroke: #4E83E8;
-    stroke-width: 2;
+    stroke: var(--clay);
+    stroke-width: 1.75;
 }
 
 .code-map__arrow-head {
-    fill: #4E83E8;
+    fill: var(--clay);
 }
 
 /* ---- dark mode ---- */
 
-html[data-theme="dark"] .code-map__canvas {
-    background-color: #1A1A19;
-    background-image: radial-gradient(circle, var(--gray-200) 1px, transparent 1px);
+html[data-theme="dark"] .code-map__viewport {
+    background: var(--gray-50);
 }
 
 html[data-theme="dark"] .code-map__card {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 16px rgba(0, 0, 0, 0.28);
 }
 
-html[data-theme="dark"] .code-map__line--hl {
+html[data-theme="dark"] .code-map__card-title {
     background: var(--gray-150);
 }
 
-html[data-theme="dark"] .code-map__token {
-    background: #4E83E8;
-    color: #FFFFFF;
+html[data-theme="dark"] .code-map__line--hl {
+    background: rgba(226, 140, 110, 0.10);
+    box-shadow: inset 2px 0 0 var(--clay);
 }
 
-html[data-theme="dark"] .code-map .tok-kw  { color: #7BA3F2; }
-html[data-theme="dark"] .code-map .tok-fn  { color: #C89AE8; }
-html[data-theme="dark"] .code-map .tok-ty  { color: #DDA94E; }
-html[data-theme="dark"] .code-map .tok-str { color: #7FBF93; }
-html[data-theme="dark"] .code-map .tok-num { color: #E08A7F; }
+html[data-theme="dark"] .code-map__token {
+    background: rgba(226, 140, 110, 0.18);
+    color: var(--clay-d);
+}
+
+html[data-theme="dark"] .code-map__group--amber .code-map__group-label,
+html[data-theme="dark"] .code-map__group--green .code-map__group-label,
+html[data-theme="dark"] .code-map__group--blue .code-map__group-label,
+html[data-theme="dark"] .code-map__group--clay .code-map__group-label {
+    color: #161615;
+}
+
+html[data-theme="dark"] .code-map .tok-kw  { color: #D98A80; }
+html[data-theme="dark"] .code-map .tok-fn  { color: var(--clay-d); }
+html[data-theme="dark"] .code-map .tok-ty  { color: #C9A95E; }
+html[data-theme="dark"] .code-map .tok-str { color: #9FB382; }
+html[data-theme="dark"] .code-map .tok-num { color: var(--clay); }
