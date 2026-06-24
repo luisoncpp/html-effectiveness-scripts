@@ -124,6 +124,22 @@ tabs:
       pulldown-cmark = "0.9"
 ```
 
+# Code Panel single tab
+
+```yaml
+type: code-panel
+tabs:
+  - name: "src/compiler.rs"
+    language: rust
+    diff: true
+    risk: attention
+    added: 58
+    removed: 0
+    content: |
+      - let tree = parse_single();
+      + let ast = parse_blocks();
+```
+
 ## SVG Canvas
 
 ```yaml

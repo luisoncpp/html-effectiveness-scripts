@@ -1,10 +1,12 @@
 <div class="code-panel{% if tabs %}{% for tab in tabs %}{% if tab.diff %} code-panel--diff{% endif %}{% endfor %}{% endif %}">
     {% if tabs and tabs|length > 0 %}
+    {% if tabs|length > 1 %}
     <div class="code-panel__tabs">
         {% for tab in tabs %}
         <button class="code-panel__tab{% if loop.first %} code-panel__tab--active{% endif %}" data-tab="{{ loop.index0 }}">{{ tab.name }}</button>
         {% endfor %}
     </div>
+    {% endif %}
     <div class="code-panel__content">
         {% for tab in tabs %}
         <div class="code-panel__panel{% if loop.first %} code-panel__panel--active{% endif %}" data-panel="{{ loop.index0 }}">
