@@ -156,6 +156,27 @@ hr {
     margin: 2em 0;
 }
 
+main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1em;
+    font-size: 0.95em;
+}
+
+main th,
+main td {
+    border: 1px solid var(--gray-200);
+    padding: 0.5em 0.75em;
+    text-align: left;
+    vertical-align: top;
+}
+
+main th {
+    font-weight: 600;
+    color: var(--slate);
+    background: var(--gray-50);
+}
+
 html[data-theme="dark"] {
     --ivory: #161615;
     --slate: #FAF9F5;

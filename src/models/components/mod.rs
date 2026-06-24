@@ -22,7 +22,7 @@ pub trait ComponentStrategy {
 /// Render block-level Markdown to HTML. Use for multi-paragraph content areas
 /// (e.g. `notice.content`, `card.content`) where `<p>`, lists, etc. are wanted.
 pub fn render_markdown(markdown: &str) -> String {
-    let parser = pulldown_cmark::Parser::new(markdown);
+    let parser = pulldown_cmark::Parser::new_ext(markdown, crate::markdown::options());
     let mut html_output = String::new();
     pulldown_cmark::html::push_html(&mut html_output, parser);
     html_output

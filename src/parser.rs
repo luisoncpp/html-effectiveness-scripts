@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use pulldown_cmark::{html, Event, Parser, Tag, TagEnd, CodeBlockKind};
 
+use crate::markdown;
 use crate::models::block::Block;
 use crate::models::document_context::DocumentContext;
 use crate::models::ui_component::{ComponentBlock, UiComponent};
@@ -69,7 +70,7 @@ fn component_yaml_text(fence_type: Option<&str>, body: &str) -> String {
 }
 
 fn parse_body(body: &str) -> Result<Vec<Block>> {
-    let parser = Parser::new(body).into_offset_iter();
+    let parser = Parser::new_ext(body, markdown::options()).into_offset_iter();
     let mut in_component_fence = false;
     let mut implicit_fence_type: Option<&'static str> = None;
     let mut yaml_buffer = String::new();
@@ -237,6 +238,21 @@ mod tests {
         assert!(matches!(&result.blocks[0], Block::Prose(_)));
         if let Block::Prose(html) = &result.blocks[0] {
             assert!(html.contains("<h1>Hello</h1>"));
+        }
+    }
+
+    #[test]
+    fn parse_markdown_table() {
+        let markdown = "| Col A | Col B |\n|-------|-------|\n| one   | two   |";
+        let result = parse(markdown).unwrap();
+        assert_eq!(result.blocks.len(), 1);
+        if let Block::Prose(html) = &result.blocks[0] {
+            assert!(html.contains("<table>"));
+            assert!(html.contains("<th>Col A</th>"));
+            assert!(html.contains("<td>one</td>"));
+            assert!(!html.contains('|'));
+        } else {
+            panic!("Expected prose block");
         }
     }
 

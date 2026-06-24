@@ -15,7 +15,10 @@ type: notice
 variant: warning
 icon: alert-triangle
 content: |
-  <strong>Breaking Change:</strong> The parser now expects multiple blocks.
+  **Breaking Change:** The parser now expects multiple blocks.
+  | Col A | Col B |
+  |-------|-------|
+  | one   | two   |
 ```
 
 ## Card
@@ -338,3 +341,9 @@ arrows:
 ---
 
 That's all primitives in a single document.
+
+Now md tables:
+
+| Col A | Col B |
+|-------|-------|
+| one   | two   |

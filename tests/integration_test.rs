@@ -4,6 +4,28 @@ use mdyaml2html::compiler;
 use std::path::PathBuf;
 
 #[test]
+fn markdown_table_renders_as_html() {
+    let input = PathBuf::from("tests/fixtures/table.md");
+    let output = PathBuf::from("tests/fixtures/table_output.html");
+
+    let args = CliArgs {
+        input,
+        output: output.clone(),
+    };
+
+    let result = compiler::run_compilation(&args);
+    assert!(result.is_ok());
+
+    let html = std::fs::read_to_string(&output).unwrap();
+    let _ = std::fs::remove_file(&output);
+
+    assert!(html.contains("<table>"));
+    assert!(html.contains("<th>Col A</th>"));
+    assert!(html.contains("<td>one</td>"));
+    assert!(!html.contains("| Col A | Col B |"));
+}
+
+#[test]
 fn basic_markdown_produces_html_with_correct_tags() {
     let input = PathBuf::from("tests/fixtures/basic.md");
     let output = PathBuf::from("tests/fixtures/basic_output.html");

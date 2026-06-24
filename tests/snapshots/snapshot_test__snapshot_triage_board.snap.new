@@ -1,5 +1,6 @@
 ---
 source: tests/snapshot_test.rs
+assertion_line: 53
 expression: html
 ---
 <!DOCTYPE html>
