@@ -42,9 +42,36 @@ fn extract_frontmatter(input: &str) -> (DocumentContext, &str) {
     (DocumentContext::default(), input)
 }
 
+const COMPONENT_FENCE_LANGS: &[&str] = &[
+    "notice",
+    "card",
+    "data-grid",
+    "timeline",
+    "board-layout",
+    "code-panel",
+    "code-map",
+    "svg-canvas",
+    "flowchart",
+    "module-map",
+    "prompt-box",
+    "triage-board",
+];
+
+fn component_fence_type(lang: &str) -> Option<&'static str> {
+    COMPONENT_FENCE_LANGS.iter().copied().find(|&name| name == lang)
+}
+
+fn component_yaml_text(fence_type: Option<&str>, body: &str) -> String {
+    match fence_type {
+        Some(t) => format!("type: {t}\n{body}"),
+        None => body.to_string(),
+    }
+}
+
 fn parse_body(body: &str) -> Result<Vec<Block>> {
     let parser = Parser::new(body).into_offset_iter();
-    let mut in_yaml = false;
+    let mut in_component_fence = false;
+    let mut implicit_fence_type: Option<&'static str> = None;
     let mut yaml_buffer = String::new();
     let mut yaml_start_byte = 0usize;
     let mut block_ordinal = 0usize;
@@ -53,19 +80,28 @@ fn parse_body(body: &str) -> Result<Vec<Block>> {
 
     for (event, range) in parser {
         match event {
-            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang)))
-                if lang.as_ref() == "yaml" =>
-            {
-                flush_prose(&mut prose_events, &mut blocks);
-                in_yaml = true;
-                yaml_buffer.clear();
-                yaml_start_byte = range.start;
+            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) => {
+                let lang = lang.as_ref();
+                let fence_type = if lang == "yaml" {
+                    None
+                } else {
+                    component_fence_type(lang)
+                };
+                if lang == "yaml" || fence_type.is_some() {
+                    flush_prose(&mut prose_events, &mut blocks);
+                    in_component_fence = true;
+                    implicit_fence_type = fence_type;
+                    yaml_buffer.clear();
+                    yaml_start_byte = range.start;
+                }
             }
-            Event::End(TagEnd::CodeBlock) if in_yaml => {
-                in_yaml = false;
+            Event::End(TagEnd::CodeBlock) if in_component_fence => {
+                in_component_fence = false;
                 block_ordinal += 1;
                 let line = line_number_at(body, yaml_start_byte);
-                let component = parse_component_block(&yaml_buffer).with_context(|| {
+                let yaml = component_yaml_text(implicit_fence_type, &yaml_buffer);
+                implicit_fence_type = None;
+                let component = parse_component_block(&yaml).with_context(|| {
                     format!(
                         "Failed to compile YAML component (block #{block_ordinal}, \
                          starting at line {line}):\n{}",
@@ -74,10 +110,10 @@ fn parse_body(body: &str) -> Result<Vec<Block>> {
                 })?;
                 blocks.push(Block::Component(component));
             }
-            Event::Text(text) if in_yaml => {
+            Event::Text(text) if in_component_fence => {
                 yaml_buffer.push_str(&text);
             }
-            _ if in_yaml => {}
+            _ if in_component_fence => {}
             other => prose_events.push(other),
         }
     }
@@ -657,5 +693,54 @@ children: not-a-list
         assert!(out.contains("| line0"));
         assert!(out.contains("| ..."), "long snippet not truncated: {out}");
         assert!(!out.contains("line19"), "truncation failed: {out}");
+    }
+
+    #[test]
+    fn parse_primitive_fence_compiles_component() {
+        let markdown = r#"```card
+title: Fence Card
+content: Body text
+```"#;
+
+        let result = parse(markdown).unwrap();
+        assert_eq!(result.blocks.len(), 1);
+        assert!(matches!(&result.blocks[0], Block::Component(_)));
+    }
+
+    #[test]
+    fn parse_primitive_fence_yaml_syntax_error_fails() {
+        let markdown = r#"```card
+broken: [unclosed
+```"#;
+
+        let err = parse(markdown).err().unwrap();
+        let msg = error_chain(err);
+        assert!(msg.contains("block #1"), "missing block ordinal: {msg}");
+        assert!(msg.contains("invalid YAML syntax"), "missing syntax label: {msg}");
+    }
+
+    #[test]
+    fn parse_primitive_fence_schema_error_fails() {
+        let markdown = r#"```prompt-box
+label: Only label
+```"#;
+
+        let err = parse(markdown).err().unwrap();
+        let msg = error_chain(err);
+        assert!(
+            msg.contains("component type \"prompt-box\""),
+            "type not named: {msg}"
+        );
+    }
+
+    #[test]
+    fn non_component_fence_stays_prose() {
+        let markdown = r#"```rust
+fn main() {}
+```"#;
+
+        let result = parse(markdown).unwrap();
+        assert_eq!(result.blocks.len(), 1);
+        assert!(matches!(&result.blocks[0], Block::Prose(_)));
     }
 }

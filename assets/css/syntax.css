@@ -1,0 +1,15 @@
+/* ---- syntax tokens (muted, palette-aligned) ---- */
+/* Shared by code_map and code_panel; emitted by src/highlight.rs. */
+
+.code-map .tok-kw,  .code-panel .tok-kw  { color: var(--rust); }
+.code-map .tok-fn,  .code-panel .tok-fn  { color: var(--clay-d); }
+.code-map .tok-ty,  .code-panel .tok-ty  { color: #9A7B2E; }
+.code-map .tok-str, .code-panel .tok-str { color: var(--olive); }
+.code-map .tok-num, .code-panel .tok-num { color: var(--clay); }
+.code-map .tok-com, .code-panel .tok-com { color: var(--gray-500); font-style: italic; }
+
+html[data-theme="dark"] .code-map .tok-kw,  html[data-theme="dark"] .code-panel .tok-kw  { color: #D98A80; }
+html[data-theme="dark"] .code-map .tok-fn,  html[data-theme="dark"] .code-panel .tok-fn  { color: var(--clay-d); }
+html[data-theme="dark"] .code-map .tok-ty,  html[data-theme="dark"] .code-panel .tok-ty  { color: #C9A95E; }
+html[data-theme="dark"] .code-map .tok-str, html[data-theme="dark"] .code-panel .tok-str { color: #9FB382; }
+html[data-theme="dark"] .code-map .tok-num, html[data-theme="dark"] .code-panel .tok-num { color: var(--clay); }
