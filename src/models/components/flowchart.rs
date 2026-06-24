@@ -66,6 +66,9 @@ impl ComponentStrategy for FlowchartData {
                 code: d.code.as_deref(),
             })
             .collect();
+        let initial_detail = first_detail_idx(&self.nodes)
+            .and_then(|idx| details.get(idx))
+            .cloned();
         context! {
             title => super::render_markdown_inline(&self.title),
             description => self.description.as_deref().map(super::render_markdown_inline),
@@ -73,15 +76,49 @@ impl ComponentStrategy for FlowchartData {
             nodes => &self.nodes,
             edges => &self.edges,
             details => details,
+            initial_detail => initial_detail,
             children => children_html,
         }
     }
 }
 
-#[derive(Serialize)]
+fn first_detail_idx(nodes: &[FlowchartNode]) -> Option<usize> {
+    nodes.iter().find_map(|node| node.detail_idx)
+}
+
+#[derive(Clone, Serialize)]
 struct FlowchartDetailView<'a> {
     title: String,
     meta: String,
     body: String,
     code: Option<&'a str>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sample_node(id: &str, detail_idx: Option<usize>) -> FlowchartNode {
+        FlowchartNode {
+            id: id.to_string(),
+            node_type: "rect".to_string(),
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 10,
+            label: id.to_string(),
+            sublabel: None,
+            detail_idx,
+        }
+    }
+
+    #[test]
+    fn first_detail_idx_skips_nodes_without_descriptions() {
+        let nodes = vec![
+            sample_node("start", None),
+            sample_node("step", Some(0)),
+            sample_node("end", Some(1)),
+        ];
+        assert_eq!(first_detail_idx(&nodes), Some(0));
+    }
 }

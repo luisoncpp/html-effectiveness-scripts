@@ -472,3 +472,31 @@ fn component_markdown_rendering_regression_test() {
     assert!(html.contains("Wire up the <code>AST</code> walker."));
 }
 
+#[test]
+fn flowchart_sparse_detail_links_render_correctly() {
+    let input = PathBuf::from("tests/fixtures/flowchart_sparse.md");
+    let output = PathBuf::from("tests/fixtures/flowchart_sparse_output.html");
+
+    let args = CliArgs {
+        input,
+        output: output.clone(),
+    };
+
+    let result = compiler::run_compilation(&args);
+    assert!(result.is_ok());
+
+    let html = std::fs::read_to_string(&output).unwrap();
+    let _ = std::fs::remove_file(&output);
+
+    assert!(!html.contains("type: flowchart"));
+    assert!(html.contains(">Start</text>"));
+    assert!(html.contains(r#"data-idx="0""#));
+    assert!(html.contains(r#"data-idx="1""#));
+    assert!(html.contains(r#"<h3 id="p-title">Step A detail</h3>"#));
+    assert!(html.contains(r#"data-detail-idx="1""#));
+    assert!(html.contains("Body for step B."));
+    assert!(html.contains("node[data-idx]"));
+    assert!(!html.contains("window.DETAIL"));
+    assert!(!html.contains("dataset.key"));
+}
+

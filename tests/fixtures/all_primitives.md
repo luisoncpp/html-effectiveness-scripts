@@ -15,7 +15,7 @@ type: notice
 variant: warning
 icon: alert-triangle
 content: |
-  <strong>Breaking Change:</strong> The parser now expects multiple blocks. **A**
+  <strong>Breaking Change:</strong> The parser now expects multiple blocks.
 ```
 
 ## Card
@@ -28,7 +28,7 @@ tags:
   - rust
   - urgent
 content: |
-  This card demonstrates tags, elevation, and content.**A**
+  This card demonstrates tags, elevation, and content.
 children:
   - type: notice
     variant: info
@@ -55,7 +55,7 @@ rows:
 type: timeline
 orientation: vertical
 steps:
-  - timestamp: "Week 1 Â· Monâ€“Tue"
+  - timestamp: "Week 1 · Mon–Tue"
     title: "Schema & API contract"
     type: "critical"
     description: "New comments and comment_reads tables, migrations, and the tRPC router stubs."
@@ -63,14 +63,14 @@ steps:
       - packages/db
       - packages/api
       - migration 0042
-  - timestamp: "Week 2 Â· Wedâ€“Fri"
+  - timestamp: "Week 2 · Wed–Fri"
     title: "UI polish & edge cases"
     type: "recovery"
     description: "Thread nesting, optimistic updates, and empty-state screens."
     tags:
       - packages/ui
       - ux
-  - timestamp: "Week 3 Â· Mon"
+  - timestamp: "Week 3 · Mon"
     title: "Ship to beta"
     type: "info"
     description: "Feature flag enabled for 10% of users."
@@ -173,8 +173,8 @@ nodes:
     y: 92
     width: 200
     height: 48
-    label: "CI Â· lint + typecheck"
-    sublabel: "~2 min Â· ci.yml"
+    label: "CI · lint + typecheck"
+    sublabel: "~2 min · ci.yml"
     detail_idx: 1
   - id: test
     type: rect
@@ -183,7 +183,7 @@ nodes:
     width: 200
     height: 48
     label: "Unit + integration tests"
-    sublabel: "~6 min Â· 3 shards"
+    sublabel: "~6 min · 3 shards"
     detail_idx: 2
   - id: gate
     type: diamond
@@ -218,15 +218,15 @@ edges:
     d: "M310,310 L310,350"
 details:
   - title: "git push main"
-    meta: "trigger Â· 0s"
+    meta: "trigger · 0s"
     body: "A push or merge to main fires the deploy workflow."
     code: "on:\n  push:\n    branches: [main]"
-  - title: "CI Â· lint + typecheck"
-    meta: "github actions Â· ~2 min"
+  - title: "CI · lint + typecheck"
+    meta: "github actions · ~2 min"
     body: "Runs ESLint and tsc --noEmit in parallel."
     code: "jobs:\n  lint:\n    run: pnpm lint && pnpm typecheck"
   - title: "Unit + integration tests"
-    meta: "github actions Â· ~6 min"
+    meta: "github actions · ~6 min"
     body: "Vitest unit suite plus the API integration tests."
     code: "run: pnpm test"
   - title: "Tests pass?"
@@ -234,9 +234,9 @@ details:
     body: "Any shard failing short-circuits here."
     code: "needs: [test]\nif: success()"
   - title: "Deploy complete"
-    meta: "terminal Â· ~30 min total"
+    meta: "terminal · ~30 min total"
     body: "Commit status flips to success."
-    code: "âœ“ web@a1b9e3f live on prod"
+    code: "✓ web@a1b9e3f live on prod"
 ```
 
 ## Module Map

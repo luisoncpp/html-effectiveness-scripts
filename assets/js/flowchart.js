@@ -1,49 +1,34 @@
 (function () {
   'use strict';
 
-  function initFlowchart (root) {
-    const nodes = root.querySelectorAll('.node');
+  function activate (root, idx) {
+    root.querySelectorAll('.node').forEach(function (x) {
+      x.classList.remove('active');
+    });
+    const node = root.querySelector('.node[data-idx="' + idx + '"]');
+    if (node) node.classList.add('active');
+
     const panel = root.querySelector('aside');
     if (!panel) return;
+    const tmpl = root.querySelector(
+      'template.flowchart-detail[data-detail-idx="' + idx + '"]'
+    );
+    if (!tmpl) return;
 
-    const titleEl = panel.querySelector('#p-title');
-    const metaEl = panel.querySelector('#p-meta');
-    const bodyEl = panel.querySelector('#p-body');
-    const codeEl = panel.querySelector('#p-code');
-    const hintEl = panel.querySelector('.hint');
+    panel.innerHTML = '';
+    panel.appendChild(tmpl.content.cloneNode(true));
+  }
 
-    const DETAIL = window.DETAIL || {};
-
-    function activate (node) {
-      nodes.forEach(function (x) { x.classList.remove('active'); });
-      node.classList.add('active');
-      const key = node.dataset.key;
-      if (!key) return;
-      const d = DETAIL[key];
-      if (!d) return;
-      if (hintEl) hintEl.style.display = 'none';
-      if (titleEl) titleEl.innerHTML = d.title;
-      if (metaEl) metaEl.textContent = d.meta;
-      if (bodyEl) bodyEl.innerHTML = d.body;
-      if (codeEl) {
-        if (d.code) {
-          codeEl.style.display = 'block';
-          codeEl.textContent = d.code;
-        } else {
-          codeEl.style.display = 'none';
-        }
-      }
-    }
-
-    nodes.forEach(function (n) {
-      n.addEventListener('click', function () {
-        activate(n);
+  function initFlowchart (root) {
+    const clickable = root.querySelectorAll('.node[data-idx]');
+    clickable.forEach(function (node) {
+      node.addEventListener('click', function () {
+        activate(root, node.dataset.idx);
       });
     });
 
-    // Activate first node by default if present
-    if (nodes.length > 0) {
-      activate(nodes[0]);
+    if (clickable.length > 0) {
+      activate(root, clickable[0].dataset.idx);
     }
   }
 
