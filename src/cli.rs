@@ -25,13 +25,8 @@ mod tests {
 
     #[test]
     fn parses_long_form_flags() {
-        let args = CliArgs::try_parse_from([
-            "prog",
-            "--input",
-            "test.md",
-            "--output",
-            "result.html",
-        ]);
+        let args =
+            CliArgs::try_parse_from(["prog", "--input", "test.md", "--output", "result.html"]);
         assert!(args.is_ok());
         let args = args.unwrap();
         assert_eq!(args.input, PathBuf::from("test.md"));
@@ -52,8 +47,7 @@ mod tests {
 
     #[test]
     fn rejects_unknown_flags() {
-        let args =
-            CliArgs::try_parse_from(["prog", "-i", "in.md", "-o", "out.html", "--verbose"]);
+        let args = CliArgs::try_parse_from(["prog", "-i", "in.md", "-o", "out.html", "--verbose"]);
         assert!(args.is_err());
     }
 }

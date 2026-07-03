@@ -8,7 +8,7 @@ pub fn options() -> Options {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pulldown_cmark::{html, Parser};
+    use pulldown_cmark::{Parser, html};
 
     #[test]
     fn tables_render_as_html() {

@@ -1,7 +1,8 @@
 use anyhow::Result;
-use minijinja::{context, Environment};
+use minijinja::{Environment, context};
 
 use crate::assets::AssetRegistry;
+use crate::html_options::{ColorMode, HtmlOptions};
 use crate::models::block::Block;
 use crate::models::ui_component::ComponentBlock;
 use crate::parser::ParsedDocument;
@@ -30,10 +31,7 @@ impl TemplateEngine {
             "notice",
             include_str!("../templates/components/notice.html"),
         )?;
-        env.add_template(
-            "card",
-            include_str!("../templates/components/card.html"),
-        )?;
+        env.add_template("card", include_str!("../templates/components/card.html"))?;
         env.add_template(
             "data_grid",
             include_str!("../templates/components/data_grid.html"),
@@ -80,26 +78,78 @@ pub fn render_document(
     engine: &TemplateEngine,
     registry: &AssetRegistry,
 ) -> Result<String> {
-    let body = render_blocks(&parsed.blocks, engine);
+    render_document_configured(
+        parsed,
+        engine,
+        DocumentRenderContext {
+            assets: registry,
+            html: None,
+        },
+    )
+}
+
+pub struct DocumentRenderContext<'a> {
+    pub assets: &'a AssetRegistry,
+    pub html: Option<&'a HtmlOptions>,
+}
+
+pub fn render_document_configured(
+    parsed: &ParsedDocument,
+    engine: &TemplateEngine,
+    render_context: DocumentRenderContext<'_>,
+) -> Result<String> {
+    let options = render_context.html.cloned().unwrap_or_default();
+    let body = filter_custom_scripts(render_blocks(&parsed.blocks, engine), &options);
     let title = parsed.context.title.as_deref().unwrap_or("Document");
-    engine.render("base", context! {
-        content => body,
-        title => title,
-        layout => parsed.context.layout_wrapper.to_string(),
-        theme => &parsed.context.theme_tokens,
-        inline_styles => registry.inline_styles(),
-        inline_scripts => registry.inline_scripts(),
-    })
+    let mode = options.color_mode();
+    let page_style_attribute = options
+        .margins
+        .map(|margins| format!(" style=\"{}\"", margins.inline_style()))
+        .unwrap_or_default();
+    engine.render(
+        "base",
+        context! {
+            content => body,
+            title => title,
+            layout => parsed.context.layout_wrapper.to_string(),
+            theme => &parsed.context.theme_tokens,
+            inline_styles => render_context.assets.inline_styles(),
+            inline_scripts => render_context.assets.inline_scripts(),
+            page_style_attribute => page_style_attribute,
+            dark_mode => mode == ColorMode::Dark,
+            switchable_mode => mode == ColorMode::Switchable,
+        },
+    )
+}
+
+fn filter_custom_scripts(body: String, options: &HtmlOptions) -> String {
+    if options.custom_scripts_enabled() {
+        return body;
+    }
+    strip_script_elements(&body)
+}
+
+fn strip_script_elements(html: &str) -> String {
+    let lowercase = html.to_ascii_lowercase();
+    let mut result = String::with_capacity(html.len());
+    let mut cursor = 0;
+    while let Some(relative_start) = lowercase[cursor..].find("<script") {
+        let start = cursor + relative_start;
+        result.push_str(&html[cursor..start]);
+        let Some(relative_end) = lowercase[start..].find("</script>") else {
+            return result;
+        };
+        cursor = start + relative_end + "</script>".len();
+    }
+    result.push_str(&html[cursor..]);
+    result
 }
 
 fn render_blocks(blocks: &[Block], engine: &TemplateEngine) -> String {
     let mut result = String::new();
     for block in blocks {
         let rendered = render_block(block, engine);
-        if !result.is_empty()
-            && !result.ends_with('\n')
-            && !rendered.starts_with('\n')
-        {
+        if !result.is_empty() && !result.ends_with('\n') && !rendered.starts_with('\n') {
             result.push('\n');
         }
         result.push_str(&rendered);

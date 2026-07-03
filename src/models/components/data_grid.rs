@@ -1,4 +1,4 @@
-use minijinja::{context, Value};
+use minijinja::{Value, context};
 use serde::Deserialize;
 
 use super::ComponentStrategy;
@@ -27,7 +27,11 @@ impl ComponentStrategy for DataGridData {
         let rows: Vec<Vec<String>> = self
             .rows
             .iter()
-            .map(|row| row.iter().map(|c| super::render_markdown_inline(c)).collect())
+            .map(|row| {
+                row.iter()
+                    .map(|c| super::render_markdown_inline(c))
+                    .collect()
+            })
             .collect();
         context! {
             columns => columns,

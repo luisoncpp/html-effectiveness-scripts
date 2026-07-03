@@ -1,4 +1,4 @@
-use minijinja::{context, Value};
+use minijinja::{Value, context};
 use serde::{Deserialize, Serialize};
 
 use super::ComponentStrategy;
@@ -41,7 +41,10 @@ impl ComponentStrategy for TimelineData {
                 timestamp: &step.timestamp,
                 title: super::render_markdown_inline(&step.title),
                 step_type: &step.step_type,
-                description: step.description.as_deref().map(super::render_markdown_inline),
+                description: step
+                    .description
+                    .as_deref()
+                    .map(super::render_markdown_inline),
                 tags: step.tags.as_deref(),
             })
             .collect();

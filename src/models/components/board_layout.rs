@@ -1,4 +1,4 @@
-use minijinja::{context, Value};
+use minijinja::{Value, context};
 use serde::{Deserialize, Serialize};
 
 use super::ComponentStrategy;

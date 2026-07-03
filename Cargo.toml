@@ -1,7 +1,12 @@
+[workspace]
+members = [".", "crates/mdyaml2html-cli"]
+resolver = "2"
+
 [package]
 name = "mdyaml2html"
 version = "0.3.1"
 edition = "2024"
+autobins = false
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }

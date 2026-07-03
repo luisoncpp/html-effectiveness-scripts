@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"{% if dark_mode %} data-theme="dark"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     {{ inline_styles }}
-    <script>
+    {% if switchable_mode %}<script>
         (function() {
             const theme = localStorage.getItem('theme') || 'light';
             if (theme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
             }
         })();
-    </script>
+    </script>{% endif %}
 </head>
 <body class="layout-{{ layout }}">
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+    {% if switchable_mode %}<button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
         <svg class="theme-toggle-sun" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -30,9 +30,9 @@
         <svg class="theme-toggle-moon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
-    </button>
+    </button>{% endif %}
     {% if layout == "wide" or layout == "reading-column" %}
-    <div class="page">
+    <div class="page"{{ page_style_attribute|safe }}>
         <main>
             {{ content }}
         </main>
@@ -43,7 +43,7 @@
     </main>
     {% endif %}
     {{ inline_scripts }}
-    <script>
+    {% if switchable_mode %}<script>
         document.addEventListener('DOMContentLoaded', () => {
             const toggleBtn = document.getElementById('theme-toggle');
             if (toggleBtn) {
@@ -59,6 +59,6 @@
                 });
             }
         });
-    </script>
+    </script>{% endif %}
 </body>
 </html>

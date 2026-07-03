@@ -2,6 +2,7 @@ use serde::Deserialize;
 
 use super::base::Renderable;
 use super::block::Block;
+use super::components::ComponentStrategy;
 use super::components::board_layout::BoardLayoutData;
 use super::components::card::CardData;
 use super::components::code_map::CodeMapData;
@@ -14,7 +15,6 @@ use super::components::prompt_box::PromptBoxData;
 use super::components::svg_canvas::SvgCanvasData;
 use super::components::timeline::TimelineData;
 use super::components::triage_board::TriageBoardData;
-use super::components::ComponentStrategy;
 use crate::renderer::TemplateEngine;
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -135,7 +135,9 @@ content: <strong>Breaking Change:</strong> The parser now expects multiple block
             UiComponent::Notice(NoticeData {
                 variant: "warning".to_string(),
                 icon: Some("alert-triangle".to_string()),
-                content: "<strong>Breaking Change:</strong> The parser now expects multiple blocks.".to_string(),
+                content:
+                    "<strong>Breaking Change:</strong> The parser now expects multiple blocks."
+                        .to_string(),
             })
         );
     }
@@ -243,7 +245,8 @@ tabs:
                         name: "src/compiler.rs".to_string(),
                         language: "rust".to_string(),
                         diff: true,
-                        content: "- let tree = parse_single();\n+ let ast = parse_blocks();".to_string(),
+                        content: "- let tree = parse_single();\n+ let ast = parse_blocks();"
+                            .to_string(),
                         risk: None,
                         added: None,
                         removed: None,
@@ -353,10 +356,22 @@ rows:
         assert_eq!(
             result.unwrap(),
             UiComponent::DataGrid(DataGridData {
-                columns: vec!["Feature".to_string(), "Status".to_string(), "Risk".to_string()],
+                columns: vec![
+                    "Feature".to_string(),
+                    "Status".to_string(),
+                    "Risk".to_string()
+                ],
                 rows: vec![
-                    vec!["AST Traversal".to_string(), "Shipped".to_string(), "Low".to_string()],
-                    vec!["Drag & Drop".to_string(), "WIP".to_string(), "High".to_string()],
+                    vec![
+                        "AST Traversal".to_string(),
+                        "Shipped".to_string(),
+                        "Low".to_string()
+                    ],
+                    vec![
+                        "Drag & Drop".to_string(),
+                        "WIP".to_string(),
+                        "High".to_string()
+                    ],
                 ],
             })
         );

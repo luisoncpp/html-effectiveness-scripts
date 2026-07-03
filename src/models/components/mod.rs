@@ -52,7 +52,10 @@ mod tests {
 
     #[test]
     fn inline_unwraps_lone_paragraph_and_keeps_formatting() {
-        assert_eq!(render_markdown_inline("Hello **world**"), "Hello <strong>world</strong>");
+        assert_eq!(
+            render_markdown_inline("Hello **world**"),
+            "Hello <strong>world</strong>"
+        );
         assert_eq!(render_markdown_inline("`code`"), "<code>code</code>");
     }
 

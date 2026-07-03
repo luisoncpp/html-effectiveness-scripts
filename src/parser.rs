@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use pulldown_cmark::{html, Event, Parser, Tag, TagEnd, CodeBlockKind};
+use pulldown_cmark::{CodeBlockKind, Event, Parser, Tag, TagEnd, html};
 
 use crate::markdown;
 use crate::models::block::Block;
@@ -59,7 +59,10 @@ const COMPONENT_FENCE_LANGS: &[&str] = &[
 ];
 
 fn component_fence_type(lang: &str) -> Option<&'static str> {
-    COMPONENT_FENCE_LANGS.iter().copied().find(|&name| name == lang)
+    COMPONENT_FENCE_LANGS
+        .iter()
+        .copied()
+        .find(|&name| name == lang)
 }
 
 fn component_yaml_text(fence_type: Option<&str>, body: &str) -> String {
@@ -157,9 +160,8 @@ fn flush_prose(events: &mut Vec<Event>, blocks: &mut Vec<Block>) {
 }
 
 fn parse_component_block(yaml_str: &str) -> Result<ComponentBlock> {
-    let mut value: serde_yaml::Value = serde_yaml::from_str(yaml_str).map_err(|e| {
-        anyhow::anyhow!("invalid YAML syntax{}: {e}", location_suffix(&e))
-    })?;
+    let mut value: serde_yaml::Value = serde_yaml::from_str(yaml_str)
+        .map_err(|e| anyhow::anyhow!("invalid YAML syntax{}: {e}", location_suffix(&e)))?;
 
     // Surface the declared `type` so the error names the component being compiled.
     let type_name = value
@@ -187,13 +189,20 @@ fn parse_component_block(yaml_str: &str) -> Result<ComponentBlock> {
         anyhow::anyhow!("could not build {what}{}: {e}", location_suffix(&e))
     })?;
 
-    Ok(ComponentBlock { component, children })
+    Ok(ComponentBlock {
+        component,
+        children,
+    })
 }
 
 /// Format a serde_yaml error's line/column (relative to the block) if available.
 fn location_suffix(err: &serde_yaml::Error) -> String {
     match err.location() {
-        Some(loc) => format!(" at line {} column {} of the block", loc.line(), loc.column()),
+        Some(loc) => format!(
+            " at line {} column {} of the block",
+            loc.line(),
+            loc.column()
+        ),
         None => String::new(),
     }
 }
@@ -205,8 +214,7 @@ fn parse_children(value: serde_yaml::Value) -> Result<Vec<Block>> {
     arr.into_iter()
         .enumerate()
         .map(|(idx, child)| {
-            parse_child_value(child)
-                .with_context(|| format!("in child #{} of `children`", idx + 1))
+            parse_child_value(child).with_context(|| format!("in child #{} of `children`", idx + 1))
         })
         .collect()
 }
@@ -732,7 +740,10 @@ broken: [unclosed
         let err = parse(markdown).err().unwrap();
         let msg = error_chain(err);
         assert!(msg.contains("block #1"), "missing block ordinal: {msg}");
-        assert!(msg.contains("invalid YAML syntax"), "missing syntax label: {msg}");
+        assert!(
+            msg.contains("invalid YAML syntax"),
+            "missing syntax label: {msg}"
+        );
     }
 
     #[test]

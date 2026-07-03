@@ -204,7 +204,11 @@ mod tests {
             }),
         ];
         let reg = AssetRegistry::from_blocks(&blocks);
-        let prompt_count = reg.stylesheets.iter().filter(|s| s.contains("prompt_box")).count();
+        let prompt_count = reg
+            .stylesheets
+            .iter()
+            .filter(|s| s.contains("prompt_box"))
+            .count();
         assert_eq!(prompt_count, 1);
     }
 
