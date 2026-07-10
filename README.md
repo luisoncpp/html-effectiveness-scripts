@@ -2,7 +2,11 @@
 
 A Rust CLI compiler that transforms hybrid Markdown files (prose + fenced YAML component blocks) into self-contained, styled HTML files.
 
-This is a fork of [ThariqS/html-effectiveness](https://github.com/ThariqS/html-effectiveness). The `output_goal/` directory contains the original demo output files (20 pre-rendered HTML documents showcasing all supported components).
+This is a fork of [ThariqS/html-effectiveness](https://github.com/ThariqS/html-effectiveness). The `output_goal/` directory contains the original baseline files (20 pre-created HTML documents that are used as the goal of how the component renders should look like).
+
+# Desktop Application
+
+If you want visualize files in this format without generating an HTML and without opening the terminal, check [YAML Markdown Viewer](https://github.com/luisoncpp/yaml-md-viewer/).
 
 ## Installation
 
@@ -82,10 +86,6 @@ The compiler produces a single `.html` file with all CSS and JavaScript inlined 
 | `title` | Any string | — |
 | `layout` | `reading-column`, `wide`, `canvas` | `reading-column` |
 | `theme` | Theme name (e.g. `clay-slate`) | — |
-
-## Demo outputs
-
-Open `output_goal/index.html` in a browser to browse all 20 pre-rendered demo documents, covering code exploration, design systems, prototypes, diagrams, reports, and editor interfaces.
 
 ## YAML Components Skill
 
