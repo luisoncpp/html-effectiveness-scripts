@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use pulldown_cmark::{CodeBlockKind, Event, Parser, Tag, TagEnd, html};
+use pulldown_cmark::{CodeBlockKind, Event, Parser, Tag, html};
 
 use crate::markdown;
 use crate::models::block::Block;
@@ -72,58 +72,164 @@ fn component_yaml_text(fence_type: Option<&str>, body: &str) -> String {
     }
 }
 
+struct FenceOpen {
+    indent: usize,
+    fence_char: char,
+    fence_len: usize,
+    content_start: usize,
+}
+
+struct ComponentFence {
+    yaml: String,
+    end: usize,
+}
+
 fn parse_body(body: &str) -> Result<Vec<Block>> {
     let parser = Parser::new_ext(body, markdown::options()).into_offset_iter();
-    let mut in_component_fence = false;
-    let mut implicit_fence_type: Option<&'static str> = None;
-    let mut yaml_buffer = String::new();
-    let mut yaml_start_byte = 0usize;
     let mut block_ordinal = 0usize;
+    let mut skip_until = 0usize;
     let mut prose_events: Vec<Event> = Vec::new();
     let mut blocks: Vec<Block> = Vec::new();
 
     for (event, range) in parser {
-        match event {
-            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) => {
-                let lang = lang.as_ref();
-                let fence_type = if lang == "yaml" {
-                    None
-                } else {
-                    component_fence_type(lang)
-                };
-                if lang == "yaml" || fence_type.is_some() {
-                    flush_prose(&mut prose_events, &mut blocks);
-                    in_component_fence = true;
-                    implicit_fence_type = fence_type;
-                    yaml_buffer.clear();
-                    yaml_start_byte = range.start;
-                }
-            }
-            Event::End(TagEnd::CodeBlock) if in_component_fence => {
-                in_component_fence = false;
-                block_ordinal += 1;
-                let line = line_number_at(body, yaml_start_byte);
-                let yaml = component_yaml_text(implicit_fence_type, &yaml_buffer);
-                implicit_fence_type = None;
-                let component = parse_component_block(&yaml).with_context(|| {
-                    format!(
-                        "Failed to compile YAML component (block #{block_ordinal}, \
-                         starting at line {line}):\n{}",
-                        indent_snippet(&yaml_buffer)
-                    )
-                })?;
-                blocks.push(Block::Component(component));
-            }
-            Event::Text(text) if in_component_fence => {
-                yaml_buffer.push_str(&text);
-            }
-            _ if in_component_fence => {}
-            other => prose_events.push(other),
+        if range.start < skip_until {
+            continue;
         }
+        if let Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) = &event {
+            if let Some(fence_type) = component_lang(lang) {
+                flush_prose(&mut prose_events, &mut blocks);
+                block_ordinal += 1;
+                let taken = take_component(
+                    FenceSpec {
+                        body,
+                        open_at: range.start,
+                        fence_type,
+                    },
+                    block_ordinal,
+                )?;
+                skip_until = taken.end;
+                blocks.push(Block::Component(taken.component));
+                continue;
+            }
+        }
+        prose_events.push(event);
     }
 
     flush_prose(&mut prose_events, &mut blocks);
     Ok(blocks)
+}
+
+struct TakenComponent {
+    component: ComponentBlock,
+    end: usize,
+}
+
+struct FenceSpec<'a> {
+    body: &'a str,
+    open_at: usize,
+    fence_type: Option<&'static str>,
+}
+
+fn component_lang(lang: &str) -> Option<Option<&'static str>> {
+    if lang == "yaml" {
+        Some(None)
+    } else {
+        component_fence_type(lang).map(Some)
+    }
+}
+
+fn take_component(spec: FenceSpec<'_>, ordinal: usize) -> Result<TakenComponent> {
+    let line = line_number_at(spec.body, spec.open_at);
+    let fence = read_component_fence(spec.body, spec.open_at).with_context(|| {
+        format!("unclosed or invalid component fence (block #{ordinal}, starting at line {line})")
+    })?;
+    let yaml = component_yaml_text(spec.fence_type, &fence.yaml);
+    let component = parse_component_block(&yaml).with_context(|| {
+        format!(
+            "Failed to compile YAML component (block #{ordinal}, starting at line {line}):\n{}",
+            indent_snippet(&fence.yaml)
+        )
+    })?;
+    Ok(TakenComponent {
+        component,
+        end: fence.end,
+    })
+}
+
+fn read_component_fence(body: &str, open_at: usize) -> Result<ComponentFence> {
+    let open = parse_fence_open(body, open_at).context("invalid component fence opener")?;
+    let close_at = find_matching_close(body, &open).context("unclosed component fence")?;
+    Ok(ComponentFence {
+        yaml: body[open.content_start..close_at].to_string(),
+        end: next_line_start(body, close_at),
+    })
+}
+
+fn parse_fence_open(body: &str, at: usize) -> Option<FenceOpen> {
+    let line_start = body[..at].rfind('\n').map(|i| i + 1).unwrap_or(0);
+    let indent = at.saturating_sub(line_start);
+    let rest = body.get(at..)?;
+    let fence_char = rest.chars().next()?;
+    if fence_char != '`' && fence_char != '~' {
+        return None;
+    }
+    let fence_len = rest.chars().take_while(|&c| c == fence_char).count();
+    if fence_len < 3 {
+        return None;
+    }
+    let after_fence = &rest[fence_len..];
+    let nl = after_fence.find('\n')?;
+    Some(FenceOpen {
+        indent,
+        fence_char,
+        fence_len,
+        content_start: at + fence_len + nl + 1,
+    })
+}
+
+fn find_matching_close(body: &str, open: &FenceOpen) -> Option<usize> {
+    let mut pos = open.content_start;
+    while pos <= body.len() {
+        let line_end = body[pos..]
+            .find('\n')
+            .map(|i| pos + i)
+            .unwrap_or(body.len());
+        let line = body[pos..line_end].trim_end_matches('\r');
+        if fence_line_closes(line, open) {
+            return Some(pos);
+        }
+        if line_end == body.len() {
+            break;
+        }
+        pos = line_end + 1;
+    }
+    None
+}
+
+fn fence_line_closes(line: &str, open: &FenceOpen) -> bool {
+    let indent = line.chars().take_while(|&c| c == ' ').count();
+    if indent != open.indent {
+        return false;
+    }
+    let after_indent = &line[indent..];
+    let fence_len = after_indent
+        .chars()
+        .take_while(|&c| c == open.fence_char)
+        .count();
+    if fence_len < open.fence_len {
+        return false;
+    }
+    after_indent
+        .chars()
+        .skip(fence_len)
+        .all(|c| c == ' ' || c == '\t')
+}
+
+fn next_line_start(body: &str, line_start: usize) -> usize {
+    match body[line_start..].find('\n') {
+        Some(i) => line_start + i + 1,
+        None => body.len(),
+    }
 }
 
 /// 1-based line number in `source` for the given byte offset.
@@ -770,4 +876,81 @@ fn main() {}
         assert_eq!(result.blocks.len(), 1);
         assert!(matches!(&result.blocks[0], Block::Prose(_)));
     }
+
+    #[test]
+    fn nested_fence_inside_notice_content_is_kept() {
+        let markdown = r#"```yaml
+type: notice
+variant: info
+icon: "The starting point"
+content: |
+  `LobbyPanel.tsx` held a JoinSection, and
+
+  ```
+  const join = () => bus.emit("ui_joinLobby", code);
+  ```
+
+  That path used a **public bus event**.
+```
+
+Afterward.
+"#;
+
+        let result = parse(markdown).unwrap();
+        assert_eq!(result.blocks.len(), 2, "expected notice + trailing prose");
+        let Block::Component(comp) = &result.blocks[0] else {
+            panic!("expected component block");
+        };
+        let UiComponent::Notice(notice) = &comp.component else {
+            panic!("expected notice");
+        };
+        assert!(
+            notice.content.contains("const join"),
+            "inner fence dropped: {}",
+            notice.content
+        );
+        assert!(
+            notice.content.contains("**public bus event**"),
+            "markdown after inner fence dropped: {}",
+            notice.content
+        );
+        let Block::Prose(html) = &result.blocks[1] else {
+            panic!("expected trailing prose");
+        };
+        assert!(html.contains("Afterward"));
+    }
+
+    #[test]
+    fn nested_fence_notice_renders_inner_markdown() {
+        let markdown = r#"```yaml
+type: notice
+variant: info
+content: |
+  Use `runGated` then a **public bus event**.
+
+  ```
+  const join = () => {};
+  ```
+
+  Still **bold** here.
+```
+"#;
+        let html = crate::compile(markdown, &crate::CompileOptions::default())
+            .unwrap()
+            .html;
+        assert!(html.contains("<code>runGated</code>"), "code missing: {html}");
+        assert!(
+            html.contains("<strong>public bus event</strong>"),
+            "bold before fence missing: {html}"
+        );
+        assert!(
+            html.contains("<strong>bold</strong>"),
+            "bold after fence missing: {html}"
+        );
+        assert!(html.contains("const join"), "code fence body missing: {html}");
+        assert!(!html.contains("**bold**"), "raw markdown leaked: {html}");
+    }
 }
+
+
+
