@@ -32,9 +32,9 @@ theme: clay-slate   # loads assets/tokens/<theme>.css
 ---
 ```
 
-- `title`: Optional. Appears in `<title>` and can be referenced by layouts.
-- `layout`: `reading-column` (default, 65ch max), `wide`, or `canvas`.
-- `theme`: Optional. Activates a theme token CSS file.
+- `title` (optional): Appears in `<title>` and can be referenced by layouts.
+- `layout` (default: `reading-column`): `reading-column` (65ch max), `wide`, or `canvas`.
+- `theme` (optional, default: empty): When set, loads `assets/tokens/<theme>.css`. Omit or leave empty to skip theme tokens.
 
 ## Markdown vs. HTML: where each is allowed
 
@@ -71,7 +71,7 @@ Two helpers in `src/models/components/mod.rs` do the work:
 | Notice | `content` | — |
 | Card | `content` | `title` |
 | DataGrid | — | `columns[]`, `rows[][]` (cells) |
-| Timeline | — | `steps[].title`, `steps[].description` |
+| Timeline | — | `steps[].title`, `steps[].description` (both inline Markdown) |
 | BoardLayout | — | `columns[].title`, `columns[].items[]` |
 | Flowchart | — | `title`, `description`, `details[].title`/`meta`/`body` |
 | ModuleMap | — | `title` |
@@ -109,6 +109,10 @@ interpreted HTML; the text appears exactly as written:
 
 ## Available Primitives
 
+Throughout this section, **(required)** means deserialization fails if the field
+is missing. **(optional)** means it may be omitted. **(default: …)** means the
+field is optional and the compiler supplies that value when absent.
+
 ### 1. Notice
 
 Callout / alert box with left border accent.
@@ -121,9 +125,9 @@ content: |
   <strong>Breaking Change:</strong> The parser now expects multiple blocks.
 ```
 
-- `variant`: CSS modifier class. Determines border/color accent.
-- `icon`: Optional string. Rendered as text if present.
-- `content`: block Markdown (and inline HTML). Use `**bold**`, lists, etc.
+- `variant` (required): CSS modifier class. Determines border/color accent (`info`, `success`, `danger`, `warning`, `sticky-nav`, etc.).
+- `content` (required): Block Markdown (and inline HTML). Use `**bold**`, lists, etc.
+- `icon` (optional): Rendered as text if present.
 
 ### 2. Card
 
@@ -144,11 +148,11 @@ children:
     content: Nested callout inside the card.
 ```
 
-- `title`: Optional header. Inline Markdown (`**bold**`, `` `code` ``).
-- `elevation`: Visual depth (box shadow). Defaults to `1`.
-- `tags`: Optional list of strings rendered as small chips (plain text).
-- `content`: block Markdown (and inline HTML) inside the card body.
-- `children`: Optional array of nested component blocks.
+- `title` (optional): Header. Inline Markdown (`**bold**`, `` `code` ``).
+- `elevation` (default: `1`): Visual depth (box shadow). `1`, `2`, or `3`.
+- `tags` (default: `[]`): Plain-text chip labels.
+- `content` (optional): Block Markdown (and inline HTML) inside the card body.
+- `children` (optional): Array of nested component blocks (see Nesting Rules).
 
 ### 3. DataGrid
 
@@ -165,8 +169,8 @@ rows:
   - ["Drag & Drop", "WIP", "High"]
 ```
 
-- `columns`: Array of header strings. Inline Markdown supported.
-- `rows`: Array of arrays. Each inner array is a row. Cell values support inline Markdown (`**bold**`, `` `code` ``, links) and inline HTML badges. Bare `&`/`<`/`>` are HTML-escaped.
+- `columns` (required): Array of header strings. Inline Markdown supported.
+- `rows` (required): Array of row arrays. Cell values support inline Markdown (`**bold**`, `` `code` ``, links) and inline HTML badges. Bare `&`/`<`/`>` are HTML-escaped.
 
 ### 4. Timeline
 
@@ -179,16 +183,22 @@ steps:
   - timestamp: "2026-05-18 10:00"
     title: "Initial Outage"
     type: "critical"
+    description: "Users unable to reach the API."
+    tags:
+      - sev-1
   - timestamp: "2026-05-18 10:15"
     title: "Rolled back to v1.2"
     type: "recovery"
+    description: "Traffic restored; monitoring continues."
 ```
 
-- `orientation`: Defaults to `vertical`.
-- `steps`: Array of `TimelineStep`.
-  - `timestamp`: String label (can be any text, not strictly a date).
-  - `title`: Step heading.
-  - `type`: Step modifier (`critical`, `recovery`, `info`, etc.). Maps to a CSS class.
+- `orientation` (default: `vertical`): Layout modifier (`vertical`, etc.).
+- `steps` (required): Array of `TimelineStep`. Each step needs all required fields below.
+  - `timestamp` (required): String label (any text — date, week range, etc.). Plain text, not Markdown.
+  - `title` (required): Step heading. Inline Markdown supported.
+  - `type` (required): Step category string. **Every step must include this** — omitting it fails deserialization. The only built-in visual effect today is `done`, which styles the dot as completed; other values (e.g. `critical`, `recovery`, `info`) are accepted and reserved for future styling.
+  - `description` (optional): Body text under the title. Inline Markdown supported.
+  - `tags` (optional): Plain-text chip labels.
 
 ### 5. BoardLayout
 
@@ -207,13 +217,10 @@ columns:
       - "Task C"
 ```
 
-- `variant`: Determines layout mode.
-  - `kanban`: Flex columns with cards.
-  - `grid`: CSS grid layout.
-  - `slides`: Horizontal scroll-snapping flex.
-- `columns`: Array of `BoardColumn`.
-  - `title`: Column header.
-  - `items`: Array of strings rendered as simple cards inside the column.
+- `variant` (default: `kanban`): Layout mode — `kanban` (flex columns), `grid` (CSS grid), or `slides` (horizontal scroll-snapping flex).
+- `columns` (required): Array of `BoardColumn`.
+  - `title` (required): Column header. Inline Markdown supported.
+  - `items` (default: `[]`): Strings rendered as simple cards inside the column. Inline Markdown supported.
 
 > Note: Columns do NOT support nested component children directly. Only the top-level `children` array of a component is parsed as nested `Block`s. Use the component's top-level `children` field for nested components.
 
@@ -237,11 +244,14 @@ tabs:
       pulldown-cmark = "0.9"
 ```
 
-- `tabs`: Array of `CodeTab`.
-  - `name`: Tab label.
-  - `language`: Used as a CSS class (e.g. `language-rust`).
-  - `diff`: Boolean. If `true`, the panel gets a `code-panel--diff` class.
-  - `content`: Raw code text rendered inside `<pre><code>`.
+- `tabs` (required): Array of `CodeTab`. At least one tab is expected.
+  - `name` (required): Tab label shown in the tab bar and file header.
+  - `language` (required): Syntax-highlighting language id (e.g. `rust`, `toml`). Emitted as `language-<name>` on `<code>`.
+  - `content` (required): Raw code text. In diff tabs, prefix lines with `+` or `-`.
+  - `diff` (default: `false`): When `true`, renders a diff view and adds `code-panel--diff` to the panel.
+  - `risk` (optional): Risk badge label in the file header (e.g. `attention`, `safe`).
+  - `added` (optional): Integer shown as `+<n>` in the file header.
+  - `removed` (optional): Integer shown as `-<n>` in the file header.
 
 ### 7. SvgCanvas
 
@@ -275,14 +285,14 @@ elements:
     class: "edge"
 ```
 
-- `viewBox`: SVG viewBox attribute. Defaults to `"0 0 800 600"`.
-- `interactive`: Boolean flag (reserved for future interactivity).
-- `elements`: Array of `SvgElement`.
-  - `type`: One of `rect`, `circle`, `text`, `edge`.
-  - Coordinates (`x`, `y`, `width`, `height`, `cx`, `cy`, `r`) are optional depending on element type.
-  - `class`: Optional CSS class string.
-  - `text`: Text content for `text` elements.
-  - `marker`: Optional SVG marker id (without `#`) for `edge` elements. Emitted as `marker-end="url(#<marker>)"`.
+- `viewBox` (default: `"0 0 800 600"`): SVG viewBox attribute.
+- `interactive` (default: `false`): Boolean flag (reserved for future interactivity).
+- `elements` (required): Array of `SvgElement` (may be empty).
+  - `type` (required): One of `rect`, `circle`, `text`, `edge`.
+  - Coordinates (`x`, `y`, `width`, `height`, `cx`, `cy`, `r`, `x2`, `y2`) (optional): Depends on element type; see `edge` below.
+  - `class` (optional): CSS class string.
+  - `text` (optional): Text content for `text` elements. Plain text (not Markdown).
+  - `marker` (optional): SVG marker id (without `#`) for `edge` elements. Emitted as `marker-end="url(#<marker>)"`.
 
 #### `edge` element
 
@@ -330,12 +340,24 @@ details:
     code: "on:\n  push:\n    branches: [main]"
 ```
 
-- `title`: Header title text.
-- `description`: Optional subheader text.
-- `viewBox`: Viewport configuration.
-- `nodes`: Array of flowchart node coordinates, dimensions, types, labels, and details index.
-- `edges`: Array of connection lines containing path definitions (`d`), type modifiers, and optional labels.
-- `details`: Array of items shown in the detail sidebar when matching nodes are hovered or clicked.
+- `title` (required): Header title. Inline Markdown supported.
+- `description` (optional): Subheader text. Inline Markdown supported.
+- `viewBox` (required): SVG viewport string (e.g. `"0 0 620 400"`). No default.
+- `nodes` (required): Array of flowchart nodes.
+  - `id` (required): Unique node id (referenced by `edges[].from` / `edges[].to`).
+  - `type` (required): Node shape — `terminal`, `rect`, or `diamond`.
+  - `x`, `y`, `width`, `height` (required): Position and size in viewBox coordinates.
+  - `label` (required): Primary label. Plain text / raw HTML in SVG `<text>`.
+  - `sublabel` (optional): Secondary label below the primary. Plain text / raw HTML.
+  - `detail_idx` (optional): Index into `details` shown when the node is selected.
+- `edges` (required): Array of connections.
+  - `from`, `to` (required): Node ids.
+  - `d` (required): SVG path `d` attribute.
+  - `edge_type` (default: `normal`): `yes`, `no`, or `normal` — controls arrow color/style.
+  - `label` (optional): Edge label. Plain text / raw HTML.
+- `details` (required): Sidebar items (may be empty). Referenced by `nodes[].detail_idx`.
+  - `title`, `meta`, `body` (required): Inline Markdown supported.
+  - `code` (optional): Literal code block shown in the sidebar (not Markdown-processed).
 
 ### 9. ModuleMap
 
@@ -365,10 +387,17 @@ edges:
     d: "M170,75 L250,75"
 ```
 
-- `title`: Map section title.
-- `viewBox`: SVG viewBox attribute.
-- `nodes`: Array of modules including custom styling classes.
-- `edges`: Array of directional paths mapping imports or dependencies.
+- `title` (required): Map section title. Inline Markdown supported.
+- `viewBox` (required): SVG viewBox string. No default.
+- `nodes` (required): Array of module boxes.
+  - `id` (required): Unique node id.
+  - `label` (required): Display name. Plain text / raw HTML in SVG `<text>`.
+  - `x`, `y`, `width`, `height` (required): Position and size.
+  - `class` (optional): CSS class on the node rect (e.g. `highlight`).
+- `edges` (required): Array of dependency arrows.
+  - `from`, `to` (required): Node ids.
+  - `d` (required): SVG path `d` attribute.
+  - `label` (optional): Edge label. Plain text / raw HTML.
 
 ### 10. CodeMap
 
@@ -418,32 +447,35 @@ arrows:
     to: startup.startup   # same syntax; plain "cardId" targets the card edge
 ```
 
-- `width` / `height`: Pixel dimensions of the canvas. All `x`/`y` coordinates
-  are absolute within it. The canvas scrolls horizontally if wider than the page.
-- `groups`: Decorative labeled containers drawn behind the cards. `variant`
-  picks the accent color of the border and label tab.
-- `cards`: Code snippet boxes. Code is syntax-highlighted automatically
-  (keywords, types, strings, numbers, function calls, comments) based on
-  `language`.
+- `title` (optional): Heading above the canvas.
+- `width` (default: `1200`): Canvas width in px. Scrolls horizontally when wider than the page.
+- `height` (required): Canvas height in px. No default.
+- `groups` (default: `[]`): Decorative labeled containers behind the cards.
+  - `label`, `x`, `y`, `width`, `height` (required).
+  - `variant` (default: `plain`): Accent color — `amber`, `green`, `blue`, `clay`, or `plain`.
+- `cards` (default: `[]`): Code snippet boxes.
+  - `id`, `x`, `y`, `width`, `code` (required).
+  - `height` (optional): Auto-sizes to content when omitted.
+  - `title` (optional): File-path header.
+  - `language` (default: empty / generic): Syntax-highlighting language id.
 - **Anchor tokens**: Inside `code`, wrap a token in `[[...]]` to render it as
   a blue highlighted chip and register it as an arrow endpoint with id
   `cardId.token`. Use `[[myId|display text]]` when the display text is not a
   valid id or appears more than once in the card. Lines containing an anchor
   get a highlighted background.
-- `arrows`: Curved connectors drawn at load time by inlined JS. `from`/`to`
-  accept `cardId.anchorId` (points at the token) or `cardId` (points at the
-  card's nearest edge).
+- `arrows` (default: `[]`): Curved connectors drawn at load time by inlined JS.
+  - `from`, `to` (required): `cardId.anchorId` (token) or `cardId` (card edge).
 
 ### 11. PromptBox (Legacy)
 
-<!-- ```yaml -->
+```yaml
 type: prompt-box
 label: My Prompt
 content: This is prompt content.
 ```
 
-- `label`: Header text.
-- `content`: Body text (pre-wrap, monospace).
+- `label` (required): Header text. Plain text (not Markdown).
+- `content` (required): Body text (pre-wrap, monospace). Shown verbatim.
 
 ### 12. TriageBoard (Legacy)
 
@@ -454,6 +486,11 @@ title: Cycle 14 triage
 subtitle: Planning board
 hintline: drag tickets between columns
 ```
+
+- `eyebrow` (required): Breadcrumb label. Plain text (not Markdown).
+- `title` (required): Main heading. Inline Markdown supported.
+- `subtitle` (required): Subheading. Inline Markdown supported.
+- `hintline` (required): Helper text. Inline Markdown supported.
 
 ## Nesting Rules
 
@@ -484,7 +521,7 @@ The parser:
 
 | Symptom | Cause |
 |---------|-------|
-| `Failed to deserialize YAML component` | Unknown `type` value or missing required field. |
+| `Failed to deserialize YAML component` | Unknown `type` value or missing required field (e.g. `timeline.steps[].type`, `flowchart.viewBox`, `code-map.height`). |
 | `children must be an array` | The `children` key is present but not a YAML sequence. |
 | `Unsupported child block type` | A child in `children` lacks a `type` key. |
 | Missing styles in output | Component CSS not registered in `assets.rs` `resolve_asset()`. |
