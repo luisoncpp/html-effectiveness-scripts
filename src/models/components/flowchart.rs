@@ -2,6 +2,7 @@ use minijinja::{Value, context};
 use serde::{Deserialize, Serialize};
 
 use super::ComponentStrategy;
+use crate::highlight::highlight_code_line;
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlowchartNode {
@@ -33,6 +34,8 @@ pub struct FlowchartDetail {
     pub meta: String,
     pub body: String,
     pub code: Option<String>,
+    #[serde(default)]
+    pub language: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
@@ -48,7 +51,10 @@ pub struct FlowchartData {
 
 impl ComponentStrategy for FlowchartData {
     fn required_assets(&self) -> (Vec<&'static str>, Vec<&'static str>) {
-        (vec!["css/flowchart.css"], vec!["js/flowchart.js"])
+        (
+            vec!["css/syntax.css", "css/flowchart.css"],
+            vec!["js/flowchart.js"],
+        )
     }
 
     fn template_name(&self) -> &'static str {
@@ -59,11 +65,15 @@ impl ComponentStrategy for FlowchartData {
         let details: Vec<FlowchartDetailView> = self
             .details
             .iter()
-            .map(|d| FlowchartDetailView {
-                title: super::render_markdown_inline(&d.title),
-                meta: super::render_markdown_inline(&d.meta),
-                body: super::render_markdown_inline(&d.body),
-                code: d.code.as_deref(),
+            .map(|d| {
+                let lang = detail_language(&d.language);
+                FlowchartDetailView {
+                    title: super::render_markdown_inline(&d.title),
+                    meta: super::render_markdown_inline(&d.meta),
+                    body: super::render_markdown_inline(&d.body),
+                    language: lang.to_string(),
+                    code_html: d.code.as_deref().map(|code| highlight_detail_code(code, lang)),
+                }
             })
             .collect();
         let initial_detail = first_detail_idx(&self.nodes)
@@ -86,12 +96,28 @@ fn first_detail_idx(nodes: &[FlowchartNode]) -> Option<usize> {
     nodes.iter().find_map(|node| node.detail_idx)
 }
 
+fn detail_language(language: &str) -> &str {
+    if language.is_empty() {
+        "cpp"
+    } else {
+        language
+    }
+}
+
+fn highlight_detail_code(code: &str, lang: &str) -> String {
+    code.split('\n')
+        .map(|line| highlight_code_line(line, lang))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 #[derive(Clone, Serialize)]
-struct FlowchartDetailView<'a> {
+struct FlowchartDetailView {
     title: String,
     meta: String,
     body: String,
-    code: Option<&'a str>,
+    language: String,
+    code_html: Option<String>,
 }
 
 #[cfg(test)]
@@ -110,6 +136,20 @@ mod tests {
             sublabel: None,
             detail_idx,
         }
+    }
+
+    #[test]
+    fn detail_code_is_syntax_highlighted() {
+        let detail = FlowchartDetail {
+            title: "Example".to_string(),
+            meta: "meta".to_string(),
+            body: "body".to_string(),
+            code: Some("if (x) return true;".to_string()),
+            language: String::new(),
+        };
+        let html = highlight_detail_code(detail.code.as_deref().unwrap(), "cpp");
+        assert!(html.contains("<span class=\"tok-kw\">if</span>"));
+        assert!(html.contains("<span class=\"tok-kw\">return</span>"));
     }
 
     #[test]
