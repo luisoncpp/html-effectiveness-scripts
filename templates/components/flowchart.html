@@ -64,8 +64,8 @@
       <h3 id="p-title">{{ initial_detail.title|safe }}</h3>
       <div class="meta" id="p-meta">{{ initial_detail.meta|safe }}</div>
       <p id="p-body">{{ initial_detail.body|safe }}</p>
-      {% if initial_detail.code %}
-      <pre id="p-code">{{ initial_detail.code|safe }}</pre>
+      {% if initial_detail.code_html %}
+      <pre id="p-code"><code class="language-{{ initial_detail.language }}">{{ initial_detail.code_html|safe }}</code></pre>
       {% endif %}
       {% else %}
       <div class="hint">Click a step in the chart →</div>
@@ -78,8 +78,8 @@
     <h3>{{ detail.title|safe }}</h3>
     <div class="meta">{{ detail.meta|safe }}</div>
     <p>{{ detail.body|safe }}</p>
-    {% if detail.code %}
-    <pre>{{ detail.code|safe }}</pre>
+    {% if detail.code_html %}
+    <pre><code class="language-{{ detail.language }}">{{ detail.code_html|safe }}</code></pre>
     {% endif %}
   </template>
   {% endfor %}
