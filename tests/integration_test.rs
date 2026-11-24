@@ -428,6 +428,8 @@ fn all_primitives_markdown_renders_every_component() {
     // Flowchart
     assert!(html.contains("flowchart"));
     assert!(html.contains("git push main"));
+    assert!(!html.contains(r#"<text class="lbl" x="0" y="0">"#));
+    assert!(html.contains(r#"x="318" y="333" text-anchor="start">pass</text>"#));
 
     // Module Map
     assert!(html.contains("module-map"));

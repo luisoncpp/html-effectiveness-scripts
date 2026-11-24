@@ -10,6 +10,7 @@ pub mod module_map;
 pub mod notice;
 pub mod prompt_box;
 pub mod svg_canvas;
+pub mod svg_path;
 pub mod timeline;
 pub mod triage_board;
 

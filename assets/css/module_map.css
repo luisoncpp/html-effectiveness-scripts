@@ -31,6 +31,15 @@
   fill: var(--slate);
 }
 
+.module-map .edge-label {
+  font-size: 10px;
+  fill: var(--gray-500);
+  paint-order: stroke;
+  stroke: var(--white);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
 .module-map .node rect {
   fill: var(--white);
   stroke: var(--gray-300);

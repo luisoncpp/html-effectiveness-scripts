@@ -28,8 +28,12 @@
           <path class="edge{% if edge.edge_type == 'yes' %} yes{% elif edge.edge_type == 'no' %} no{% endif %}"
                 d="{{ edge.d }}"
                 marker-end="{% if edge.edge_type == 'yes' %}url(#arrow-olive){% elif edge.edge_type == 'no' %}url(#arrow-rust){% else %}url(#arrow){% endif %}"/>
-          {% if edge.label %}
-          <text class="lbl" x="0" y="0">{{ edge.label|safe }}</text>
+          {% endfor %}
+
+          <!-- edge labels -->
+          {% for edge in edges %}
+          {% if edge.label and edge.label_pos %}
+          <text class="lbl" x="{{ edge.label_pos.x }}" y="{{ edge.label_pos.y }}" text-anchor="{{ edge.label_pos.anchor }}">{{ edge.label|safe }}</text>
           {% endif %}
           {% endfor %}
 

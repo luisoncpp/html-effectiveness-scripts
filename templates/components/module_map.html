@@ -11,8 +11,12 @@
       <!-- edges -->
       {% for edge in edges %}
       <path class="edge" d="{{ edge.d }}" marker-end="url(#arrow)"/>
-      {% if edge.label %}
-      <text class="edge-label" x="0" y="0">{{ edge.label|safe }}</text>
+      {% endfor %}
+
+      <!-- edge labels -->
+      {% for edge in edges %}
+      {% if edge.label and edge.label_pos %}
+      <text class="edge-label" x="{{ edge.label_pos.x }}" y="{{ edge.label_pos.y }}" text-anchor="{{ edge.label_pos.anchor }}">{{ edge.label|safe }}</text>
       {% endif %}
       {% endfor %}
 
